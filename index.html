@@ -4,186 +4,190 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>StockLens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0f0f0f;
-    --surface: #1a1a1a;
-    --surface2: #242424;
-    --surface3: #2e2e2e;
-    --border: #333;
-    --accent: #f0a500;
-    --accent2: #e07b00;
-    --text: #f0f0f0;
-    --text2: #aaa;
-    --text3: #666;
-    --danger: #e05555;
-    --success: #4caf7d;
-    --radius: 12px;
-    --radius-sm: 8px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
-  
-  /* HEADER */
-  .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-  .header-logo { display: flex; align-items: center; gap: 8px; }
-  .header-logo .dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
-  .header-logo span { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
-  .header-logo span em { color: var(--accent); font-style: normal; }
-  .nav-tabs { display: flex; gap: 4px; }
-  .nav-tab { padding: 7px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: var(--text2); transition: all 0.2s; }
-  .nav-tab.active { background: var(--accent); color: #000; font-weight: 700; }
+:root {
+  --bg: #0f0f0f; --surface: #1a1a1a; --surface2: #242424; --surface3: #2e2e2e;
+  --border: #333; --accent: #f0a500; --accent2: #e07b00;
+  --text: #f0f0f0; --text2: #aaa; --text3: #666;
+  --danger: #e05555; --success: #4caf7d;
+  --radius: 12px; --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
 
-  /* PAGES */
-  .page { display: none; padding: 16px; padding-bottom: 80px; }
-  .page.active { display: block; }
+/* HEADER */
+.header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.header-logo { display: flex; align-items: center; gap: 8px; }
+.header-logo .dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
+.header-logo span { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
+.header-logo span em { color: var(--accent); font-style: normal; }
+.nav-tabs { display: flex; gap: 4px; }
+.nav-tab { padding: 7px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: var(--text2); transition: all 0.2s; font-family: inherit; }
+.nav-tab.active { background: var(--accent); color: #000; font-weight: 700; }
 
-  /* SECTION TITLE */
-  .section-title { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); margin: 20px 0 10px; }
-  .section-title:first-child { margin-top: 0; }
+/* PAGES */
+.page { display: none; padding: 16px; padding-bottom: 80px; }
+.page.active { display: block; }
 
-  /* CARDS */
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+/* SECTION TITLE */
+.section-title { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); margin: 20px 0 10px; }
+.section-title:first-child { margin-top: 0; }
 
-  /* FRAME PICKER */
-  .picker-step { margin-bottom: 20px; }
-  .picker-label { font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
-  .pill-row { display: flex; flex-wrap: wrap; gap: 8px; }
-  .pill { padding: 8px 16px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text2); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
-  .pill.selected { border-color: var(--accent); background: rgba(240,165,0,0.12); color: var(--accent); }
-  .pill:active { transform: scale(0.96); }
+/* PICKER */
+.picker-label { font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+.pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.pill { padding: 8px 16px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text2); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+.pill.selected { border-color: var(--accent); background: rgba(240,165,0,0.12); color: var(--accent); }
+.pill:active { transform: scale(0.96); }
 
-  /* SHAPE GRID */
-  .shape-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .shape-card { background: var(--surface2); border: 2px solid var(--border); border-radius: var(--radius); overflow: hidden; cursor: pointer; transition: all 0.15s; position: relative; }
-  .shape-card.selected { border-color: var(--accent); }
-  .shape-card.selected::after { content: "✓"; position: absolute; top: 6px; right: 6px; background: var(--accent); color: #000; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; }
-  .shape-card img { width: 100%; height: 110px; object-fit: cover; display: block; }
-  .shape-card-label { padding: 8px 10px; font-size: 12px; font-weight: 600; color: var(--text); text-align: center; }
-  .shape-card:active { transform: scale(0.97); }
+/* SHAPE GRID */
+.shape-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.shape-card { background: var(--surface2); border: 2px solid var(--border); border-radius: var(--radius); overflow: hidden; cursor: pointer; transition: all 0.15s; position: relative; }
+.shape-card.selected { border-color: var(--accent); }
+.shape-card.selected::after { content: "✓"; position: absolute; top: 6px; right: 6px; background: var(--accent); color: #000; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; }
+.shape-card img { width: 100%; height: 110px; object-fit: cover; display: block; }
+.shape-card-label { padding: 8px 10px; font-size: 12px; font-weight: 600; color: var(--text); text-align: center; }
+.shape-card:active { transform: scale(0.97); }
 
-  /* MATTRESS TOGGLE */
-  .toggle-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .toggle-btn { padding: 12px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); background: var(--surface2); color: var(--text2); font-size: 13px; font-weight: 600; cursor: pointer; text-align: center; transition: all 0.15s; }
-  .toggle-btn.selected { border-color: var(--accent); background: rgba(240,165,0,0.12); color: var(--accent); }
+/* MATTRESS TOGGLE */
+.toggle-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.toggle-btn { padding: 12px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); background: var(--surface2); color: var(--text2); font-size: 13px; font-weight: 600; cursor: pointer; text-align: center; transition: all 0.15s; font-family: inherit; }
+.toggle-btn.selected { border-color: var(--accent); background: rgba(240,165,0,0.12); color: var(--accent); }
 
-  /* SELECTED SUMMARY */
-  .selection-summary { background: rgba(240,165,0,0.08); border: 1.5px solid rgba(240,165,0,0.3); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 16px; font-size: 13px; color: var(--accent); font-weight: 600; display: none; }
-  .selection-summary.show { display: block; }
+/* FORM FIELDS */
+.field-group { margin-bottom: 16px; }
+.field-label { font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+.field-label .req { color: var(--accent); }
+input[type="text"], input[type="number"], textarea {
+  width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text); font-size: 15px; padding: 12px 14px; outline: none; font-family: inherit;
+  transition: border-color 0.15s; -webkit-appearance: none;
+}
+input[type="text"]:focus, input[type="number"]:focus, textarea:focus { border-color: var(--accent); }
+input[type="number"] { -moz-appearance: textfield; }
 
-  /* FORM FIELDS */
-  .field-group { margin-bottom: 16px; }
-  .field-label { font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-  .field-label .req { color: var(--accent); }
-  input[type="text"], input[type="number"], textarea {
-    width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--radius-sm);
-    color: var(--text); font-size: 15px; padding: 12px 14px; outline: none; font-family: inherit;
-    transition: border-color 0.15s; -webkit-appearance: none;
-  }
-  input[type="text"]:focus, input[type="number"]:focus, textarea:focus { border-color: var(--accent); }
-  input[type="number"] { -moz-appearance: textfield; }
+/* DATETIME */
+.datetime-display { background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 14px; color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; margin-bottom: 20px; }
 
-  /* DATETIME DISPLAY */
-  .datetime-display { background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 14px; color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; }
+/* PHOTO AREA */
+.photo-area { border: 2px dashed var(--border); border-radius: var(--radius); padding: 18px; text-align: center; cursor: pointer; background: var(--surface2); }
+.photo-area .icon { font-size: 26px; margin-bottom: 4px; }
+.photo-area .label { font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 2px; }
+.photo-area .hint { font-size: 11px; color: var(--text3); }
+.photo-preview-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.photo-thumb-wrap { position: relative; display: inline-block; }
+.photo-thumb { width: 72px; height: 72px; border-radius: 8px; object-fit: cover; border: 2px solid var(--border); display: block; }
+.photo-remove { position: absolute; top: -6px; right: -6px; background: var(--danger); color: white; width: 18px; height: 18px; border-radius: 50%; font-size: 11px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 800; border: none; line-height: 1; }
 
-  /* PHOTO UPLOAD */
-  .photo-area { border: 2px dashed var(--border); border-radius: var(--radius); padding: 20px; text-align: center; cursor: pointer; transition: all 0.15s; background: var(--surface2); }
-  .photo-area:active { border-color: var(--accent); }
-  .photo-area .icon { font-size: 28px; margin-bottom: 6px; }
-  .photo-area .hint { font-size: 12px; color: var(--text3); }
-  .photo-area .label { font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 4px; }
-  .photo-preview-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-  .photo-thumb { width: 72px; height: 72px; border-radius: 8px; object-fit: cover; border: 2px solid var(--border); position: relative; display: inline-block; }
-  .photo-thumb-wrap { position: relative; display: inline-block; }
-  .photo-remove { position: absolute; top: -6px; right: -6px; background: var(--danger); color: white; width: 18px; height: 18px; border-radius: 50%; font-size: 11px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 800; border: none; }
+/* LINE ITEMS */
+.line-item { background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+.line-item-info { flex: 1; }
+.line-item-name { font-size: 13px; font-weight: 700; color: var(--text); }
+.line-item-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.line-item-pieces { font-size: 20px; font-weight: 800; color: var(--accent); margin: 0 12px; }
+.line-item-remove { background: none; border: none; color: var(--danger); font-size: 18px; cursor: pointer; padding: 4px; }
 
-  /* SUBMIT BUTTON */
-  .btn-primary { width: 100%; padding: 16px; background: var(--accent); color: #000; font-size: 15px; font-weight: 800; border: none; border-radius: var(--radius); cursor: pointer; letter-spacing: 0.3px; transition: all 0.15s; margin-top: 8px; }
-  .btn-primary:active { transform: scale(0.98); background: var(--accent2); }
-  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-secondary { padding: 10px 18px; background: var(--surface2); color: var(--text2); font-size: 13px; font-weight: 600; border: 1.5px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; }
-  .btn-secondary:active { background: var(--surface3); }
-  .btn-danger { padding: 8px 14px; background: rgba(224,85,85,0.1); color: var(--danger); font-size: 12px; font-weight: 600; border: 1.5px solid rgba(224,85,85,0.3); border-radius: var(--radius-sm); cursor: pointer; }
+/* ADD FRAME PANEL */
+.add-frame-panel { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
+.add-frame-panel.collapsed .panel-body { display: none; }
+.panel-header { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+.panel-header-title { font-size: 14px; font-weight: 700; color: var(--text); }
+.panel-toggle { font-size: 20px; color: var(--text2); transition: transform 0.2s; }
+.add-frame-panel.collapsed .panel-toggle { transform: rotate(-90deg); }
+.panel-body { margin-top: 16px; }
 
-  /* ENTRY CARDS */
-  .entry-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; }
-  .entry-card.deleted { opacity: 0.4; border-color: var(--danger); }
-  .entry-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
-  .entry-frame { font-size: 14px; font-weight: 700; color: var(--text); line-height: 1.3; }
-  .entry-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
-  .entry-badge { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
-  .badge-active { background: rgba(76,175,125,0.15); color: var(--success); }
-  .badge-edited { background: rgba(240,165,0,0.15); color: var(--accent); }
-  .badge-deleted { background: rgba(224,85,85,0.15); color: var(--danger); }
-  .entry-detail-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
-  .entry-detail { font-size: 12px; color: var(--text2); }
-  .entry-detail strong { color: var(--text); }
-  .entry-actions { display: flex; gap: 8px; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; }
-  .entry-photos { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
-  .entry-photo { width: 56px; height: 56px; border-radius: 6px; object-fit: cover; cursor: pointer; border: 1px solid var(--border); }
+/* BUTTONS */
+.btn-primary { width: 100%; padding: 16px; background: var(--accent); color: #000; font-size: 15px; font-weight: 800; border: none; border-radius: var(--radius); cursor: pointer; transition: all 0.15s; font-family: inherit; }
+.btn-primary:active { transform: scale(0.98); background: var(--accent2); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-secondary { padding: 10px 18px; background: var(--surface2); color: var(--text2); font-size: 13px; font-weight: 600; border: 1.5px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; font-family: inherit; }
+.btn-add { width: 100%; padding: 12px; background: rgba(240,165,0,0.1); color: var(--accent); font-size: 13px; font-weight: 700; border: 1.5px dashed rgba(240,165,0,0.4); border-radius: var(--radius-sm); cursor: pointer; font-family: inherit; margin-top: 8px; }
+.btn-add:active { background: rgba(240,165,0,0.2); }
+.btn-danger { padding: 8px 14px; background: rgba(224,85,85,0.1); color: var(--danger); font-size: 12px; font-weight: 600; border: 1.5px solid rgba(224,85,85,0.3); border-radius: var(--radius-sm); cursor: pointer; font-family: inherit; }
 
-  /* AUDIT TRAIL */
-  .audit-row { font-size: 11px; color: var(--text3); padding: 4px 0; border-left: 2px solid var(--border); padding-left: 8px; margin-top: 4px; }
+/* SHIPMENT CARDS */
+.shipment-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; }
+.shipment-card.deleted { opacity: 0.4; border-color: var(--danger); }
+.shipment-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+.shipment-id { font-size: 11px; color: var(--text3); font-variant-numeric: tabular-nums; }
+.shipment-dt { font-size: 13px; font-weight: 700; color: var(--text); }
+.shipment-vehicle { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.entry-badge { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+.badge-active { background: rgba(76,175,125,0.15); color: var(--success); }
+.badge-edited { background: rgba(240,165,0,0.15); color: var(--accent); }
+.badge-deleted { background: rgba(224,85,85,0.15); color: var(--danger); }
+.sku-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+.sku-table th { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.8px; padding: 4px 6px; text-align: left; border-bottom: 1px solid var(--border); }
+.sku-table td { font-size: 12px; color: var(--text); padding: 6px 6px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.sku-table td:last-child { font-weight: 700; color: var(--accent); text-align: right; }
+.shipment-photos { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.shipment-photo { width: 56px; height: 56px; border-radius: 6px; object-fit: cover; cursor: pointer; border: 1px solid var(--border); }
+.shipment-actions { display: flex; gap: 8px; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; }
+.audit-row { font-size: 11px; color: var(--text3); padding: 4px 0; border-left: 2px solid var(--border); padding-left: 8px; margin-top: 4px; }
+.total-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-top: 1px solid var(--border); margin-top: 4px; }
+.total-row span { font-size: 12px; color: var(--text2); font-weight: 600; }
+.total-row strong { font-size: 14px; color: var(--accent); font-weight: 800; }
 
-  /* MODAL */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
-  .modal-overlay.open { display: flex; }
-  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 420px; max-height: 85vh; overflow-y: auto; }
-  .modal-header { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-  .modal-title { font-size: 15px; font-weight: 700; }
-  .modal-close { background: none; border: none; color: var(--text2); font-size: 20px; cursor: pointer; padding: 4px; }
-  .modal-body { padding: 16px; }
-  .modal-footer { padding: 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; }
+/* FILTER */
+.filter-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; scrollbar-width: none; }
+.filter-bar::-webkit-scrollbar { display: none; }
+.filter-chip { padding: 6px 14px; border-radius: 16px; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text2); font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; font-family: inherit; }
+.filter-chip.active { border-color: var(--accent); color: var(--accent); background: rgba(240,165,0,0.1); }
 
-  /* TOAST */
-  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 12px 20px; font-size: 13px; font-weight: 600; z-index: 300; transition: transform 0.3s; white-space: nowrap; }
-  .toast.show { transform: translateX(-50%) translateY(0); }
-  .toast.success { border-color: var(--success); color: var(--success); }
-  .toast.error { border-color: var(--danger); color: var(--danger); }
+/* STATS */
+.stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; }
+.stat-val { font-size: 24px; font-weight: 800; color: var(--accent); }
+.stat-label { font-size: 11px; color: var(--text3); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.8px; }
 
-  /* AUTH SCREEN */
-  .auth-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 32px 20px; text-align: center; }
-  .auth-logo { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
-  .auth-logo em { color: var(--accent); font-style: normal; }
-  .auth-sub { font-size: 14px; color: var(--text2); margin-bottom: 40px; }
-  .btn-google { display: flex; align-items: center; gap: 10px; padding: 14px 24px; background: white; color: #333; font-size: 15px; font-weight: 600; border: none; border-radius: var(--radius); cursor: pointer; font-family: inherit; }
+/* AUTH */
+.auth-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 32px 20px; text-align: center; }
+.auth-logo { font-size: 40px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
+.auth-logo em { color: var(--accent); font-style: normal; }
+.auth-sub { font-size: 14px; color: var(--text2); margin-bottom: 48px; line-height: 1.6; }
+.btn-google { display: flex; align-items: center; gap: 10px; padding: 14px 24px; background: white; color: #333; font-size: 15px; font-weight: 600; border: none; border-radius: var(--radius); cursor: pointer; font-family: inherit; }
 
-  /* FILTER BAR */
-  .filter-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; scrollbar-width: none; }
-  .filter-bar::-webkit-scrollbar { display: none; }
-  .filter-chip { padding: 6px 14px; border-radius: 16px; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text2); font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-  .filter-chip.active { border-color: var(--accent); color: var(--accent); background: rgba(240,165,0,0.1); }
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; display: none; align-items: flex-end; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius) var(--radius) 0 0; width: 100%; max-height: 90vh; overflow-y: auto; }
+.modal-header { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--surface); z-index: 1; }
+.modal-title { font-size: 15px; font-weight: 700; }
+.modal-close { background: none; border: none; color: var(--text2); font-size: 22px; cursor: pointer; line-height: 1; }
+.modal-body { padding: 16px; }
+.modal-footer { padding: 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; position: sticky; bottom: 0; background: var(--surface); }
 
-  /* MANAGER STATS */
-  .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; }
-  .stat-val { font-size: 24px; font-weight: 800; color: var(--accent); }
-  .stat-label { font-size: 11px; color: var(--text3); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.8px; }
+/* TOAST */
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 12px 20px; font-size: 13px; font-weight: 600; z-index: 300; transition: transform 0.3s; white-space: nowrap; pointer-events: none; }
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.success { border-color: var(--success); color: var(--success); }
+.toast.error { border-color: var(--danger); color: var(--danger); }
 
-  /* IMAGE LIGHTBOX */
-  .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 400; display: none; align-items: center; justify-content: center; }
-  .lightbox.open { display: flex; }
-  .lightbox img { max-width: 100%; max-height: 90vh; border-radius: 8px; }
-  .lightbox-close { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.1); border: none; color: white; font-size: 24px; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+/* LIGHTBOX */
+.lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 400; display: none; align-items: center; justify-content: center; }
+.lightbox.open { display: flex; }
+.lightbox img { max-width: 100%; max-height: 90vh; border-radius: 8px; }
+.lightbox-close { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.1); border: none; color: white; font-size: 24px; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; }
 
-  /* LOADING */
-  .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .loading-row { display: flex; align-items: center; gap: 10px; justify-content: center; padding: 32px; color: var(--text2); font-size: 14px; }
-
-  /* EMPTY STATE */
-  .empty-state { text-align: center; padding: 48px 20px; color: var(--text3); }
-  .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
-  .empty-state p { font-size: 14px; }
-
-  /* DIVIDER */
-  .divider { height: 1px; background: var(--border); margin: 16px 0; }
-
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+/* MISC */
+.spinner { width: 18px; height: 18px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; vertical-align: middle; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty-state { text-align: center; padding: 48px 20px; color: var(--text3); }
+.empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+.pieces-input-row { display: flex; align-items: center; gap: 10px; }
+.pieces-input-row input { flex: 1; }
+.step-indicator { display: flex; gap: 4px; margin-bottom: 16px; }
+.step-dot { height: 3px; flex: 1; border-radius: 2px; background: var(--border); transition: background 0.2s; }
+.step-dot.done { background: var(--success); }
+.step-dot.active { background: var(--accent); }
 </style>
 </head>
 <body>
 
+<!-- AUTH -->
 <div id="authScreen" class="auth-screen">
   <div class="auth-logo">Stock<em>Lens</em></div>
   <div class="auth-sub">Raw Stock Inward Register<br>Honey Touch Warehousing</div>
@@ -193,55 +197,67 @@
   </button>
 </div>
 
+<!-- APP -->
 <div id="app" style="display:none">
   <div class="header">
     <div class="header-logo"><div class="dot"></div><span>Stock<em>Lens</em></span></div>
     <div class="nav-tabs">
-      <button class="nav-tab active" onclick="showPage('entry')">Entry</button>
-      <button class="nav-tab" onclick="showPage('log')">Log</button>
-      <button class="nav-tab" onclick="showPage('manager')">Manager</button>
+      <button class="nav-tab active" onclick="showPage('entry', this)">Entry</button>
+      <button class="nav-tab" onclick="showPage('log', this)">Log</button>
+      <button class="nav-tab" onclick="showPage('manager', this)">Manager</button>
     </div>
   </div>
 
   <!-- ENTRY PAGE -->
   <div id="page-entry" class="page active">
-    <div class="section-title">Date & Time</div>
     <div class="datetime-display" id="datetimeDisplay">--</div>
 
-    <div class="section-title">Select Frame</div>
-    
-    <div class="picker-step">
-      <div class="picker-label">Size</div>
-      <div class="pill-row" id="sizeRow">
-        <div class="pill" onclick="selectSize('Single 2.5ft')">Single 2.5ft</div>
-        <div class="pill" onclick="selectSize('Single 3ft')">Single 3ft</div>
-        <div class="pill" onclick="selectSize('Double 4ft')">Double 4ft</div>
-        <div class="pill" onclick="selectSize('Queen 5ft')">Queen 5ft</div>
-        <div class="pill" onclick="selectSize('King 6ft')">King 6ft</div>
+    <!-- FRAME LINE ITEMS LIST -->
+    <div class="section-title">Frames in this Shipment</div>
+    <div id="lineItemsList"></div>
+
+    <!-- ADD FRAME PANEL -->
+    <div class="add-frame-panel" id="addFramePanel">
+      <div class="panel-header" onclick="togglePanel()">
+        <div class="panel-header-title">+ Add Frame</div>
+        <div class="panel-toggle">▼</div>
+      </div>
+      <div class="panel-body" id="panelBody">
+
+        <div class="picker-label">Size</div>
+        <div class="pill-row" id="sizeRow">
+          <div class="pill" onclick="selectSize(this,'Single 2.5ft')">Single 2.5ft</div>
+          <div class="pill" onclick="selectSize(this,'Single 3ft')">Single 3ft</div>
+          <div class="pill" onclick="selectSize(this,'Double 4ft')">Double 4ft</div>
+          <div class="pill" onclick="selectSize(this,'Queen 5ft')">Queen 5ft</div>
+          <div class="pill" onclick="selectSize(this,'King 6ft')">King 6ft</div>
+        </div>
+
+        <div id="shapeStep" style="display:none">
+          <div class="picker-label">Shape</div>
+          <div class="shape-grid" id="shapeGrid"></div>
+        </div>
+
+        <div id="mattressStep" style="display:none">
+          <div class="picker-label">Mattress</div>
+          <div class="toggle-row">
+            <div class="toggle-btn" onclick="selectMattress(this,'With Mattress')">With Mattress</div>
+            <div class="toggle-btn" onclick="selectMattress(this,'Without Mattress')">Without Mattress</div>
+          </div>
+        </div>
+
+        <div id="piecesStep" style="display:none">
+          <div class="picker-label">Pieces</div>
+          <div class="pieces-input-row">
+            <input type="number" id="piecesInput" placeholder="Number of pieces" min="1">
+            <button class="btn-secondary" onclick="addLineItem()">Add</button>
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <div class="picker-step" id="shapeStep" style="display:none">
-      <div class="picker-label">Shape</div>
-      <div class="shape-grid" id="shapeGrid"></div>
-    </div>
-
-    <div class="picker-step" id="mattressStep" style="display:none">
-      <div class="picker-label">Mattress</div>
-      <div class="toggle-row">
-        <div class="toggle-btn" onclick="selectMattress('With Mattress')">With Mattress</div>
-        <div class="toggle-btn" onclick="selectMattress('Without Mattress')">Without Mattress</div>
-      </div>
-    </div>
-
-    <div class="selection-summary" id="selectionSummary"></div>
-
-    <div class="section-title">Quantity</div>
-    <div class="field-group">
-      <div class="field-label">Pieces Received <span class="req">*</span></div>
-      <input type="number" id="piecesInput" placeholder="Enter number of pieces" min="1">
-    </div>
-
+    <!-- VEHICLE DETAILS -->
     <div class="section-title">Vehicle Details</div>
     <div class="field-group">
       <div class="field-label">Vehicle Number</div>
@@ -258,33 +274,34 @@
       <div class="photo-preview-row" id="vehiclePhotoPreview"></div>
     </div>
 
+    <!-- PROOF PHOTOS -->
     <div class="section-title">Proof Photos</div>
     <div class="field-group">
-      <div class="field-label">Stock / Delivery Photos</div>
       <div class="photo-area" onclick="document.getElementById('proofPhotoInput').click()">
         <div class="icon">📦</div>
         <div class="label">Tap to add proof photos</div>
         <div class="hint">Multiple photos allowed</div>
       </div>
-      <input type="file" id="proofPhotoInput" accept="image/*" capture="environment" style="display:none" multiple onchange="handleProofPhotos(event)">
+      <input type="file" id="proofPhotoInput" accept="image/*" style="display:none" multiple onchange="handleProofPhotos(event)">
       <div class="photo-preview-row" id="proofPhotoPreview"></div>
     </div>
 
+    <!-- NOTES -->
     <div class="section-title">Notes</div>
     <div class="field-group">
       <textarea id="notesInput" rows="3" placeholder="Any additional remarks..."></textarea>
     </div>
 
-    <button class="btn-primary" id="submitBtn" onclick="submitEntry()">Submit Entry</button>
+    <button class="btn-primary" id="submitBtn" onclick="submitShipment()">Submit Shipment</button>
   </div>
 
   <!-- LOG PAGE -->
   <div id="page-log" class="page">
     <div class="filter-bar">
-      <div class="filter-chip active" onclick="filterLog('all', this)">All</div>
-      <div class="filter-chip" onclick="filterLog('active', this)">Active</div>
-      <div class="filter-chip" onclick="filterLog('edited', this)">Edited</div>
-      <div class="filter-chip" onclick="filterLog('deleted', this)">Deleted</div>
+      <div class="filter-chip active" onclick="filterLog('all',this)">All</div>
+      <div class="filter-chip" onclick="filterLog('active',this)">Active</div>
+      <div class="filter-chip" onclick="filterLog('edited',this)">Edited</div>
+      <div class="filter-chip" onclick="filterLog('deleted',this)">Deleted</div>
     </div>
     <div id="logList"></div>
   </div>
@@ -292,20 +309,19 @@
   <!-- MANAGER PAGE -->
   <div id="page-manager" class="page">
     <div class="stats-row">
-      <div class="stat-card"><div class="stat-val" id="statTotal">0</div><div class="stat-label">Total Entries</div></div>
+      <div class="stat-card"><div class="stat-val" id="statShipments">0</div><div class="stat-label">Shipments</div></div>
       <div class="stat-card"><div class="stat-val" id="statToday">0</div><div class="stat-label">Today</div></div>
       <div class="stat-card"><div class="stat-val" id="statPieces">0</div><div class="stat-label">Total Pieces</div></div>
-      <div class="stat-card"><div class="stat-val" id="statActive">0</div><div class="stat-label">Active</div></div>
+      <div class="stat-card"><div class="stat-val" id="statSKUs">0</div><div class="stat-label">SKU Lines</div></div>
     </div>
-    <div style="display:flex; gap:8px; margin-bottom:16px;">
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
       <button class="btn-secondary" style="flex:1" onclick="exportCSV()">Export CSV</button>
-      <button class="btn-secondary" style="flex:1" onclick="loadEntries()">Refresh</button>
+      <button class="btn-secondary" style="flex:1" onclick="loadShipments()">Refresh</button>
     </div>
-    <div class="section-title">All Entries</div>
     <div class="filter-bar">
-      <div class="filter-chip active" onclick="filterManager('all', this)">All</div>
-      <div class="filter-chip" onclick="filterManager('today', this)">Today</div>
-      <div class="filter-chip" onclick="filterManager('week', this)">This Week</div>
+      <div class="filter-chip active" onclick="filterManager('all',this)">All</div>
+      <div class="filter-chip" onclick="filterManager('today',this)">Today</div>
+      <div class="filter-chip" onclick="filterManager('week',this)">This Week</div>
     </div>
     <div id="managerList"></div>
   </div>
@@ -315,13 +331,13 @@
 <div class="modal-overlay" id="editModal">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title">Edit Entry</div>
+      <div class="modal-title">Edit Shipment</div>
       <button class="modal-close" onclick="closeModal('editModal')">×</button>
     </div>
     <div class="modal-body" id="editModalBody"></div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('editModal')" style="flex:1">Cancel</button>
-      <button class="btn-primary" onclick="saveEdit()" style="flex:1; margin-top:0">Save</button>
+      <button class="btn-primary" onclick="saveEdit()" style="flex:1;margin-top:0">Save</button>
     </div>
   </div>
 </div>
@@ -351,592 +367,487 @@ const SHAPE_IMAGES = {
 };
 
 
-// ═══════════════════════════════════════════════
-// CONFIG
-// ═══════════════════════════════════════════════
+// ── CONFIG ──────────────────────────────────────
 const CLIENT_ID = '801481705797-g3fpo65r67n8437eti5lknpa6gqcvf3e.apps.googleusercontent.com';
 const FOLDER_ID = '1hqiHgj4uhYxGYL3g2CaCsX1ICxeHWyEN';
-const DB_FILE = 'stocklens_db.json';
-const SCOPES = 'https://www.googleapis.com/auth/drive.file';
+const DB_FILE   = 'stocklens_db.json';
+const SCOPES    = 'https://www.googleapis.com/auth/drive.file';
 
-// ═══════════════════════════════════════════════
-// FRAME CATALOGUE
-// ═══════════════════════════════════════════════
-const SINGLE_ONLY = ['trolley', 'metal'];
-const ALL_SIZES = ['Single 2.5ft', 'Single 3ft', 'Double 4ft', 'Queen 5ft', 'King 6ft'];
-const SINGLE_SIZES = ['Single 2.5ft', 'Single 3ft'];
-
+// ── FRAME CATALOGUE ──────────────────────────────
+const DQK  = ['Double 4ft','Queen 5ft','King 6ft'];
 const SHAPES = [
-  { id: 'wooden_half_patti', label: 'Wooden Half Patti', sizes: ALL_SIZES },
-  { id: 'wooden_full_patti', label: 'Wooden Full Patti', sizes: ALL_SIZES },
-  { id: 'golden', label: 'Golden', sizes: ALL_SIZES },
-  { id: 'square', label: 'Square', sizes: ALL_SIZES },
-  { id: 'headboard', label: 'Headboard', sizes: ALL_SIZES },
-  { id: 'lg', label: 'LG', sizes: ALL_SIZES },
-  { id: 'round', label: 'Round', sizes: ALL_SIZES },
-  { id: 'element', label: 'Element', sizes: ALL_SIZES },
-  { id: 'nesto', label: 'Nesto', sizes: ALL_SIZES },
-  { id: 'oslo', label: 'Oslo', sizes: ALL_SIZES },
-  { id: 'trolley', label: 'Trolley', sizes: SINGLE_SIZES },
-  { id: 'metal', label: 'Metal', sizes: SINGLE_SIZES },
+  { id:'round',            label:'Round',            sizes:['Single 2.5ft','Single 3ft'] },
+  { id:'square',           label:'Square',           sizes:['Single 2.5ft','Single 3ft'] },
+  { id:'metal',            label:'Metal',            sizes:['Single 2.5ft'] },
+  { id:'headboard',        label:'Headboard',        sizes:['Single 3ft','Double 4ft','Queen 5ft','King 6ft'] },
+  { id:'element',          label:'Element',          sizes:['Single 3ft','Double 4ft','Queen 5ft','King 6ft'] },
+  { id:'trolley',          label:'Trolley',          sizes:['Single 3ft'] },
+  { id:'golden',           label:'Golden',           sizes:DQK },
+  { id:'lg',               label:'LG',               sizes:DQK },
+  { id:'nesto',            label:'Nesto',             sizes:DQK },
+  { id:'oslo',             label:'Oslo',             sizes:DQK },
+  { id:'wooden_half_patti',label:'Wooden Half Patti',sizes:DQK },
+  { id:'wooden_full_patti',label:'Wooden Full Patti',sizes:DQK },
 ];
 
-// ═══════════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════════
-let accessToken = null;
-let dbFileId = null;
-let entries = [];
-let selectedSize = null;
-let selectedShape = null;
-let selectedMattress = null;
-let vehiclePhotoData = null;
-let proofPhotosData = [];
-let editingEntryId = null;
-let logFilter = 'all';
+// ── STATE ────────────────────────────────────────
+let accessToken   = null;
+let dbFileId      = null;
+let shipments     = [];
+let lineItems     = [];          // current draft line items
+let draftSize     = null;
+let draftShape    = null;
+let draftMattress = null;
+let vehiclePhotoData  = null;
+let proofPhotosData   = [];
+let editingId     = null;
+let logFilter     = 'all';
 let managerFilter = 'all';
+let photosFolderId = null;
 
-// ═══════════════════════════════════════════════
-// AUTH
-// ═══════════════════════════════════════════════
+// ── AUTH ─────────────────────────────────────────
 function signIn() {
   const client = google.accounts.oauth2.initTokenClient({
-    client_id: CLIENT_ID,
-    scope: SCOPES,
+    client_id: CLIENT_ID, scope: SCOPES,
     callback: async (resp) => {
       if (resp.access_token) {
         accessToken = resp.access_token;
         document.getElementById('authScreen').style.display = 'none';
         document.getElementById('app').style.display = 'block';
         startClock();
-        await loadEntries();
+        await loadShipments();
       }
     }
   });
   client.requestAccessToken();
 }
 
-// ═══════════════════════════════════════════════
-// CLOCK
-// ═══════════════════════════════════════════════
+// ── CLOCK ─────────────────────────────────────────
 function startClock() {
-  function update() {
-    const now = new Date();
-    const d = now.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
-    const t = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    document.getElementById('datetimeDisplay').textContent = d + '  •  ' + t;
-  }
-  update();
-  setInterval(update, 1000);
+  const el = document.getElementById('datetimeDisplay');
+  const update = () => {
+    const n = new Date();
+    el.textContent = n.toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})
+      + '  •  ' + n.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  };
+  update(); setInterval(update,1000);
 }
 
-// ═══════════════════════════════════════════════
-// NAVIGATION
-// ═══════════════════════════════════════════════
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  event.target.classList.add('active');
-  if (name === 'log') renderLog();
-  if (name === 'manager') renderManager();
+// ── NAVIGATION ───────────────────────────────────
+function showPage(name, el) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  el.classList.add('active');
+  if (name==='log') renderLog();
+  if (name==='manager') renderManager();
 }
 
-// ═══════════════════════════════════════════════
-// FRAME PICKER
-// ═══════════════════════════════════════════════
-function selectSize(size) {
-  selectedSize = size;
-  selectedShape = null;
-  selectedMattress = null;
-  document.querySelectorAll('#sizeRow .pill').forEach(p => p.classList.remove('selected'));
-  event.target.classList.add('selected');
+// ── PANEL TOGGLE ─────────────────────────────────
+function togglePanel() {
+  document.getElementById('addFramePanel').classList.toggle('collapsed');
+}
+
+function openPanel() {
+  document.getElementById('addFramePanel').classList.remove('collapsed');
+}
+
+function collapsePanel() {
+  document.getElementById('addFramePanel').classList.add('collapsed');
+  resetDraft();
+}
+
+function resetDraft() {
+  draftSize=null; draftShape=null; draftMattress=null;
+  document.querySelectorAll('#sizeRow .pill').forEach(p=>p.classList.remove('selected'));
+  document.querySelectorAll('.shape-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('piecesInput').value='';
+  document.getElementById('shapeStep').style.display='none';
+  document.getElementById('mattressStep').style.display='none';
+  document.getElementById('piecesStep').style.display='none';
+}
+
+// ── FRAME PICKER ─────────────────────────────────
+function selectSize(el, size) {
+  draftSize=size; draftShape=null; draftMattress=null;
+  document.querySelectorAll('#sizeRow .pill').forEach(p=>p.classList.remove('selected'));
+  el.classList.add('selected');
   renderShapeGrid(size);
-  document.getElementById('shapeStep').style.display = 'block';
-  document.getElementById('mattressStep').style.display = 'none';
-  updateSummary();
+  document.getElementById('shapeStep').style.display='block';
+  document.getElementById('mattressStep').style.display='none';
+  document.getElementById('piecesStep').style.display='none';
 }
 
 function renderShapeGrid(size) {
-  const grid = document.getElementById('shapeGrid');
-  const available = SHAPES.filter(s => s.sizes.includes(size));
-  grid.innerHTML = available.map(s => `
-    <div class="shape-card" id="shape_${s.id}" onclick="selectShape('${s.id}', '${s.label}')">
+  const available = SHAPES.filter(s=>s.sizes.includes(size));
+  document.getElementById('shapeGrid').innerHTML = available.map(s=>`
+    <div class="shape-card" id="sc_${s.id}" onclick="selectShape(this,'${s.id}','${s.label}')">
       <img src="${SHAPE_IMAGES[s.id]}" alt="${s.label}" loading="lazy">
       <div class="shape-card-label">${s.label}</div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-function selectShape(id, label) {
-  selectedShape = label;
-  selectedMattress = null;
-  document.querySelectorAll('.shape-card').forEach(c => c.classList.remove('selected'));
-  document.getElementById('shape_' + id).classList.add('selected');
-  document.getElementById('mattressStep').style.display = 'block';
-  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('selected'));
-  updateSummary();
+function selectShape(el, id, label) {
+  draftShape=label; draftMattress=null;
+  document.querySelectorAll('.shape-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('mattressStep').style.display='block';
+  document.getElementById('piecesStep').style.display='none';
+  document.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('selected'));
 }
 
-function selectMattress(val) {
-  selectedMattress = val;
-  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('selected'));
-  event.target.classList.add('selected');
-  updateSummary();
+function selectMattress(el, val) {
+  draftMattress=val;
+  document.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('piecesStep').style.display='block';
+  document.getElementById('piecesInput').focus();
 }
 
-function updateSummary() {
-  const el = document.getElementById('selectionSummary');
-  if (selectedSize && selectedShape && selectedMattress) {
-    el.textContent = `${selectedSize}  •  ${selectedShape}  •  ${selectedMattress}`;
-    el.classList.add('show');
-  } else if (selectedSize && selectedShape) {
-    el.textContent = `${selectedSize}  •  ${selectedShape}`;
-    el.classList.add('show');
-  } else if (selectedSize) {
-    el.textContent = selectedSize;
-    el.classList.add('show');
-  } else {
-    el.classList.remove('show');
+// ── ADD LINE ITEM ─────────────────────────────────
+function addLineItem() {
+  if (!draftSize||!draftShape||!draftMattress) { showToast('Complete frame selection','error'); return; }
+  const pieces = parseInt(document.getElementById('piecesInput').value);
+  if (!pieces||pieces<1) { showToast('Enter valid piece count','error'); return; }
+  lineItems.push({ size:draftSize, shape:draftShape, mattress:draftMattress, pieces });
+  renderLineItems();
+  collapsePanel();
+  showToast('Frame added ✓','success');
+}
+
+function removeLineItem(i) {
+  lineItems.splice(i,1);
+  renderLineItems();
+}
+
+function renderLineItems() {
+  const el = document.getElementById('lineItemsList');
+  if (lineItems.length===0) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--text3);padding:8px 0 12px;">No frames added yet. Use the panel below to add frames.</div>';
+    return;
   }
+  el.innerHTML = lineItems.map((item,i)=>`
+    <div class="line-item">
+      <div class="line-item-info">
+        <div class="line-item-name">${item.shape} • ${item.mattress}</div>
+        <div class="line-item-sub">${item.size}</div>
+      </div>
+      <div class="line-item-pieces">${item.pieces}</div>
+      <button class="line-item-remove" onclick="removeLineItem(${i})">×</button>
+    </div>`).join('') +
+    `<div style="font-size:12px;color:var(--text3);text-align:right;margin-bottom:8px;">
+      Total: <strong style="color:var(--accent)">${lineItems.reduce((s,i)=>s+i.pieces,0)} pcs</strong>
+    </div>`;
 }
 
-// ═══════════════════════════════════════════════
-// PHOTO HANDLING
-// ═══════════════════════════════════════════════
-function handleVehiclePhoto(event) {
-  const file = event.target.files[0];
-  if (!file) return;
+// ── PHOTOS ────────────────────────────────────────
+function handleVehiclePhoto(e) {
+  const file = e.target.files[0]; if(!file) return;
   const reader = new FileReader();
-  reader.onload = e => {
-    vehiclePhotoData = e.target.result;
-    const preview = document.getElementById('vehiclePhotoPreview');
-    preview.innerHTML = `
+  reader.onload = ev => {
+    vehiclePhotoData = ev.target.result;
+    document.getElementById('vehiclePhotoPreview').innerHTML = `
       <div class="photo-thumb-wrap">
         <img class="photo-thumb" src="${vehiclePhotoData}" onclick="openLightbox('${vehiclePhotoData}')">
-        <button class="photo-remove" onclick="removeVehiclePhoto()">×</button>
+        <button class="photo-remove" onclick="clearVehiclePhoto()">×</button>
       </div>`;
   };
   reader.readAsDataURL(file);
 }
 
-function removeVehiclePhoto() {
-  vehiclePhotoData = null;
-  document.getElementById('vehiclePhotoPreview').innerHTML = '';
-  document.getElementById('vehiclePhotoInput').value = '';
+function clearVehiclePhoto() {
+  vehiclePhotoData=null;
+  document.getElementById('vehiclePhotoPreview').innerHTML='';
+  document.getElementById('vehiclePhotoInput').value='';
 }
 
-function handleProofPhotos(event) {
-  const files = Array.from(event.target.files);
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      proofPhotosData.push(e.target.result);
-      renderProofPreviews();
-    };
+function handleProofPhotos(e) {
+  Array.from(e.target.files).forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=ev=>{ proofPhotosData.push(ev.target.result); renderProofPreviews(); };
     reader.readAsDataURL(file);
   });
 }
 
 function renderProofPreviews() {
-  const preview = document.getElementById('proofPhotoPreview');
-  preview.innerHTML = proofPhotosData.map((d, i) => `
+  document.getElementById('proofPhotoPreview').innerHTML = proofPhotosData.map((d,i)=>`
     <div class="photo-thumb-wrap">
       <img class="photo-thumb" src="${d}" onclick="openLightbox('${d}')">
-      <button class="photo-remove" onclick="removeProofPhoto(${i})">×</button>
+      <button class="photo-remove" onclick="removeProof(${i})">×</button>
     </div>`).join('');
 }
 
-function removeProofPhoto(i) {
-  proofPhotosData.splice(i, 1);
-  renderProofPreviews();
+function removeProof(i) { proofPhotosData.splice(i,1); renderProofPreviews(); }
+
+// ── DRIVE ─────────────────────────────────────────
+async function ensurePhotosFolderId() {
+  if (photosFolderId) return photosFolderId;
+  const res = await fetch(`https://www.googleapis.com/drive/v3/files?q=name='photos' and '${FOLDER_ID}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false&fields=files(id)`,
+    { headers:{ Authorization:'Bearer '+accessToken } });
+  const data = await res.json();
+  if (data.files&&data.files.length>0) { photosFolderId=data.files[0].id; return photosFolderId; }
+  const cr = await fetch('https://www.googleapis.com/drive/v3/files?fields=id',{
+    method:'POST', headers:{ Authorization:'Bearer '+accessToken,'Content-Type':'application/json' },
+    body: JSON.stringify({ name:'photos', mimeType:'application/vnd.google-apps.folder', parents:[FOLDER_ID] })
+  });
+  const cd = await cr.json(); photosFolderId=cd.id; return photosFolderId;
 }
 
-// ═══════════════════════════════════════════════
-// DRIVE
-// ═══════════════════════════════════════════════
+async function uploadPhoto(dataUrl, filename) {
+  const fid = await ensurePhotosFolderId();
+  const res = await fetch(dataUrl); const blob = await res.blob();
+  const meta = { name:filename, parents:[fid] };
+  const form = new FormData();
+  form.append('metadata', new Blob([JSON.stringify(meta)],{type:'application/json'}));
+  form.append('file', blob);
+  const up = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',
+    { method:'POST', headers:{ Authorization:'Bearer '+accessToken }, body:form });
+  return (await up.json()).id;
+}
+
 async function loadDB() {
   try {
-    // Find existing DB file
-    const res = await fetch(`https://www.googleapis.com/drive/v3/files?q=name='${DB_FILE}' and '${FOLDER_ID}' in parents and trashed=false&fields=files(id,name)`, {
-      headers: { Authorization: 'Bearer ' + accessToken }
-    });
+    const res = await fetch(`https://www.googleapis.com/drive/v3/files?q=name='${DB_FILE}' and '${FOLDER_ID}' in parents and trashed=false&fields=files(id)`,
+      { headers:{ Authorization:'Bearer '+accessToken } });
     const data = await res.json();
-    if (data.files && data.files.length > 0) {
+    if (data.files&&data.files.length>0) {
       dbFileId = data.files[0].id;
-      const content = await fetch(`https://www.googleapis.com/drive/v3/files/${dbFileId}?alt=media`, {
-        headers: { Authorization: 'Bearer ' + accessToken }
-      });
+      const content = await fetch(`https://www.googleapis.com/drive/v3/files/${dbFileId}?alt=media`,
+        { headers:{ Authorization:'Bearer '+accessToken } });
       const db = await content.json();
-      entries = db.entries || [];
-    } else {
-      entries = [];
-      dbFileId = null;
-    }
-  } catch(e) {
-    entries = [];
-    dbFileId = null;
-  }
+      shipments = db.shipments || [];
+    } else { shipments=[]; dbFileId=null; }
+  } catch(e) { shipments=[]; dbFileId=null; }
 }
 
 async function saveDB() {
-  const content = JSON.stringify({ entries }, null, 2);
-  const blob = new Blob([content], { type: 'application/json' });
+  const content = JSON.stringify({ shipments }, null, 2);
+  const blob = new Blob([content],{type:'application/json'});
   if (dbFileId) {
-    await fetch(`https://www.googleapis.com/upload/drive/v3/files/${dbFileId}?uploadType=media`, {
-      method: 'PATCH',
-      headers: { Authorization: 'Bearer ' + accessToken, 'Content-Type': 'application/json' },
-      body: blob
-    });
+    await fetch(`https://www.googleapis.com/upload/drive/v3/files/${dbFileId}?uploadType=media`,
+      { method:'PATCH', headers:{ Authorization:'Bearer '+accessToken,'Content-Type':'application/json' }, body:blob });
   } else {
-    const meta = { name: DB_FILE, parents: [FOLDER_ID] };
+    const meta = { name:DB_FILE, parents:[FOLDER_ID] };
     const form = new FormData();
-    form.append('metadata', new Blob([JSON.stringify(meta)], { type: 'application/json' }));
+    form.append('metadata', new Blob([JSON.stringify(meta)],{type:'application/json'}));
     form.append('file', blob);
-    const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', {
-      method: 'POST',
-      headers: { Authorization: 'Bearer ' + accessToken },
-      body: form
-    });
-    const d = await res.json();
-    dbFileId = d.id;
+    const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',
+      { method:'POST', headers:{ Authorization:'Bearer '+accessToken }, body:form });
+    dbFileId = (await res.json()).id;
   }
 }
 
-async function uploadPhotoToDrive(dataUrl, filename) {
-  // Find or create photos subfolder
-  let photosFolderId = null;
-  const folderRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=name='photos' and '${FOLDER_ID}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false&fields=files(id)`, {
-    headers: { Authorization: 'Bearer ' + accessToken }
-  });
-  const folderData = await folderRes.json();
-  if (folderData.files && folderData.files.length > 0) {
-    photosFolderId = folderData.files[0].id;
-  } else {
-    const createRes = await fetch('https://www.googleapis.com/drive/v3/files?fields=id', {
-      method: 'POST',
-      headers: { Authorization: 'Bearer ' + accessToken, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: 'photos', mimeType: 'application/vnd.google-apps.folder', parents: [FOLDER_ID] })
-    });
-    const cd = await createRes.json();
-    photosFolderId = cd.id;
-  }
-
-  // Upload photo
-  const res = await fetch(dataUrl);
-  const blob = await res.blob();
-  const meta = { name: filename, parents: [photosFolderId] };
-  const form = new FormData();
-  form.append('metadata', new Blob([JSON.stringify(meta)], { type: 'application/json' }));
-  form.append('file', blob);
-  const uploadRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', {
-    method: 'POST',
-    headers: { Authorization: 'Bearer ' + accessToken },
-    body: form
-  });
-  const ud = await uploadRes.json();
-  return ud.id;
-}
-
-// ═══════════════════════════════════════════════
-// SUBMIT ENTRY
-// ═══════════════════════════════════════════════
-async function submitEntry() {
-  if (!selectedSize || !selectedShape || !selectedMattress) {
-    showToast('Please complete frame selection', 'error'); return;
-  }
-  const pieces = parseInt(document.getElementById('piecesInput').value);
-  if (!pieces || pieces < 1) {
-    showToast('Enter valid piece count', 'error'); return;
-  }
-
+// ── SUBMIT ────────────────────────────────────────
+async function submitShipment() {
+  if (lineItems.length===0) { showToast('Add at least one frame','error'); return; }
   const btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>';
-
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>';
   try {
-    const entryId = 'e_' + Date.now();
+    const sid = 'S'+Date.now();
     const now = new Date().toISOString();
-
-    // Upload photos
-    let vehiclePhotoId = null;
-    let proofPhotoIds = [];
-
-    if (vehiclePhotoData) {
-      vehiclePhotoId = await uploadPhotoToDrive(vehiclePhotoData, `vehicle_${entryId}.jpg`);
-    }
-    for (let i = 0; i < proofPhotosData.length; i++) {
-      const id = await uploadPhotoToDrive(proofPhotosData[i], `proof_${entryId}_${i}.jpg`);
-      proofPhotoIds.push(id);
-    }
-
-    const entry = {
-      id: entryId,
-      timestamp: now,
-      size: selectedSize,
-      shape: selectedShape,
-      mattress: selectedMattress,
-      pieces,
+    let vehiclePhotoId=null, proofPhotoIds=[];
+    if (vehiclePhotoData) vehiclePhotoId = await uploadPhoto(vehiclePhotoData,`vehicle_${sid}.jpg`);
+    for (let i=0;i<proofPhotosData.length;i++)
+      proofPhotoIds.push(await uploadPhoto(proofPhotosData[i],`proof_${sid}_${i}.jpg`));
+    const shipment = {
+      id:sid, timestamp:now,
+      lineItems:[...lineItems],
       vehicle: document.getElementById('vehicleInput').value.trim(),
-      vehiclePhotoId,
-      proofPhotoIds,
+      vehiclePhotoId, proofPhotoIds,
       notes: document.getElementById('notesInput').value.trim(),
-      status: 'active',
-      audit: []
+      status:'active', audit:[],
+      _vehiclePhotoData: vehiclePhotoData,
+      _proofPhotosData: [...proofPhotosData]
     };
-
-    // Store photo data locally for preview (Drive IDs used for reference)
-    entry._vehiclePhotoData = vehiclePhotoData;
-    entry._proofPhotosData = [...proofPhotosData];
-
-    entries.unshift(entry);
+    shipments.unshift(shipment);
     await saveDB();
-    showToast('Entry saved ✓', 'success');
+    showToast('Shipment saved ✓','success');
     resetForm();
   } catch(e) {
-    showToast('Error saving entry', 'error');
-    console.error(e);
+    console.error(e); showToast('Error saving shipment','error');
   }
-
-  btn.disabled = false;
-  btn.textContent = 'Submit Entry';
+  btn.disabled=false; btn.textContent='Submit Shipment';
 }
 
 function resetForm() {
-  selectedSize = null; selectedShape = null; selectedMattress = null;
-  vehiclePhotoData = null; proofPhotosData = [];
-  document.getElementById('piecesInput').value = '';
-  document.getElementById('vehicleInput').value = '';
-  document.getElementById('notesInput').value = '';
-  document.getElementById('vehiclePhotoPreview').innerHTML = '';
-  document.getElementById('proofPhotoPreview').innerHTML = '';
-  document.getElementById('vehiclePhotoInput').value = '';
-  document.getElementById('proofPhotoInput').value = '';
-  document.getElementById('selectionSummary').classList.remove('show');
-  document.getElementById('shapeStep').style.display = 'none';
-  document.getElementById('mattressStep').style.display = 'none';
-  document.querySelectorAll('.pill').forEach(p => p.classList.remove('selected'));
-  document.querySelectorAll('.shape-card').forEach(c => c.classList.remove('selected'));
-  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('selected'));
+  lineItems=[]; vehiclePhotoData=null; proofPhotosData=[];
+  document.getElementById('vehicleInput').value='';
+  document.getElementById('notesInput').value='';
+  document.getElementById('vehiclePhotoPreview').innerHTML='';
+  document.getElementById('proofPhotoPreview').innerHTML='';
+  document.getElementById('vehiclePhotoInput').value='';
+  document.getElementById('proofPhotoInput').value='';
+  renderLineItems();
+  collapsePanel();
 }
 
-// ═══════════════════════════════════════════════
-// LOAD ENTRIES
-// ═══════════════════════════════════════════════
-async function loadEntries() {
-  await loadDB();
-  renderLog();
-  renderManager();
-}
+// ── LOAD ──────────────────────────────────────────
+async function loadShipments() { await loadDB(); renderLog(); renderManager(); renderLineItems(); }
 
-// ═══════════════════════════════════════════════
-// RENDER LOG
-// ═══════════════════════════════════════════════
+// ── RENDER LOG ────────────────────────────────────
 function renderLog() {
   const list = document.getElementById('logList');
-  let filtered = entries;
-  if (logFilter !== 'all') filtered = entries.filter(e => e.status === logFilter);
-  if (filtered.length === 0) {
-    list.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>No entries yet</p></div>';
-    return;
+  let filtered = shipments;
+  if (logFilter!=='all') filtered = shipments.filter(s=>s.status===logFilter);
+  if (filtered.length===0) {
+    list.innerHTML='<div class="empty-state"><div class="icon">📋</div><p>No shipments yet</p></div>'; return;
   }
-  list.innerHTML = filtered.map(e => entryCardHTML(e, false)).join('');
+  list.innerHTML = filtered.map(s=>shipmentCardHTML(s)).join('');
 }
 
-function filterLog(f, el) {
-  logFilter = f;
-  document.querySelectorAll('#page-log .filter-chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  renderLog();
+function filterLog(f,el) {
+  logFilter=f;
+  document.querySelectorAll('#page-log .filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active'); renderLog();
 }
 
-// ═══════════════════════════════════════════════
-// RENDER MANAGER
-// ═══════════════════════════════════════════════
+// ── RENDER MANAGER ────────────────────────────────
 function renderManager() {
-  const active = entries.filter(e => e.status === 'active');
-  const today = entries.filter(e => e.timestamp && e.timestamp.startsWith(new Date().toISOString().slice(0,10)));
-  const totalPieces = entries.filter(e => e.status !== 'deleted').reduce((s,e) => s + (e.pieces || 0), 0);
-  document.getElementById('statTotal').textContent = entries.length;
-  document.getElementById('statToday').textContent = today.length;
-  document.getElementById('statPieces').textContent = totalPieces;
-  document.getElementById('statActive').textContent = active.length;
-
+  const active = shipments.filter(s=>s.status!=='deleted');
+  const today  = shipments.filter(s=>s.timestamp&&s.timestamp.startsWith(new Date().toISOString().slice(0,10)));
+  const totalPieces = active.reduce((sum,s)=>(s.lineItems||[]).reduce((a,l)=>a+l.pieces,0)+sum,0);
+  const totalSKUs   = active.reduce((sum,s)=>sum+(s.lineItems||[]).length,0);
+  document.getElementById('statShipments').textContent = shipments.length;
+  document.getElementById('statToday').textContent     = today.length;
+  document.getElementById('statPieces').textContent    = totalPieces;
+  document.getElementById('statSKUs').textContent      = totalSKUs;
   const list = document.getElementById('managerList');
-  let filtered = entries;
+  let filtered = shipments;
   const now = new Date();
-  if (managerFilter === 'today') {
-    filtered = entries.filter(e => e.timestamp && e.timestamp.startsWith(now.toISOString().slice(0,10)));
-  } else if (managerFilter === 'week') {
-    const weekAgo = new Date(now - 7*24*60*60*1000).toISOString();
-    filtered = entries.filter(e => e.timestamp > weekAgo);
+  if (managerFilter==='today') filtered=shipments.filter(s=>s.timestamp&&s.timestamp.startsWith(now.toISOString().slice(0,10)));
+  if (managerFilter==='week')  { const wa=new Date(now-7*24*60*60*1000).toISOString(); filtered=shipments.filter(s=>s.timestamp>wa); }
+  if (filtered.length===0) {
+    list.innerHTML='<div class="empty-state"><div class="icon">📊</div><p>No shipments in this range</p></div>'; return;
   }
-  if (filtered.length === 0) {
-    list.innerHTML = '<div class="empty-state"><div class="icon">📊</div><p>No entries in this range</p></div>';
-    return;
-  }
-  list.innerHTML = filtered.map(e => entryCardHTML(e, true)).join('');
+  list.innerHTML = filtered.map(s=>shipmentCardHTML(s)).join('');
 }
 
-function filterManager(f, el) {
-  managerFilter = f;
-  document.querySelectorAll('#page-manager .filter-chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  renderManager();
+function filterManager(f,el) {
+  managerFilter=f;
+  document.querySelectorAll('#page-manager .filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active'); renderManager();
 }
 
-// ═══════════════════════════════════════════════
-// ENTRY CARD HTML
-// ═══════════════════════════════════════════════
-function entryCardHTML(e, isManager) {
-  const dt = e.timestamp ? new Date(e.timestamp).toLocaleString('en-IN', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '--';
-  const statusBadge = `<span class="entry-badge badge-${e.status}">${e.status.charAt(0).toUpperCase()+e.status.slice(1)}</span>`;
-  
+// ── SHIPMENT CARD HTML ────────────────────────────
+function shipmentCardHTML(s) {
+  const dt = s.timestamp ? new Date(s.timestamp).toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '--';
+  const badge = `<span class="entry-badge badge-${s.status}">${s.status.charAt(0).toUpperCase()+s.status.slice(1)}</span>`;
+  const items = s.lineItems||[];
+  const totalPieces = items.reduce((a,l)=>a+l.pieces,0);
+  const skuRows = items.map(l=>`
+    <tr>
+      <td>${l.size}</td>
+      <td>${l.shape}</td>
+      <td>${l.mattress}</td>
+      <td>${l.pieces}</td>
+    </tr>`).join('');
   const photos = [];
-  if (e._vehiclePhotoData) photos.push(e._vehiclePhotoData);
-  if (e._proofPhotosData) photos.push(...e._proofPhotosData);
-  
-  const photoHTML = photos.length > 0 ? `
-    <div class="entry-photos">
-      ${photos.map(p => `<img class="entry-photo" src="${p}" onclick="openLightbox('${p}')">`).join('')}
+  if (s._vehiclePhotoData) photos.push(s._vehiclePhotoData);
+  if (s._proofPhotosData) photos.push(...s._proofPhotosData);
+  const photoHTML = photos.length>0 ? `<div class="shipment-photos">${photos.map(p=>`<img class="shipment-photo" src="${p}" onclick="openLightbox('${p}')">`).join('')}</div>` : '';
+  const auditHTML = s.audit&&s.audit.length>0 ? s.audit.map(a=>`<div class="audit-row">${a}</div>`).join('') : '';
+  const actions = s.status!=='deleted' ? `
+    <div class="shipment-actions">
+      <button class="btn-secondary" onclick="openEdit('${s.id}')">Edit</button>
+      <button class="btn-danger" onclick="deleteShipment('${s.id}')">Delete</button>
     </div>` : '';
-
-  const auditHTML = e.audit && e.audit.length > 0 ? `
-    <div style="margin-top:8px">
-      ${e.audit.map(a => `<div class="audit-row">${a}</div>`).join('')}
-    </div>` : '';
-
-  const actions = e.status !== 'deleted' ? `
-    <div class="entry-actions">
-      <button class="btn-secondary" onclick="openEdit('${e.id}')">Edit</button>
-      <button class="btn-danger" onclick="deleteEntry('${e.id}')">Delete</button>
-    </div>` : '';
-
   return `
-    <div class="entry-card ${e.status === 'deleted' ? 'deleted' : ''}" id="card_${e.id}">
-      <div class="entry-header">
+    <div class="shipment-card ${s.status==='deleted'?'deleted':''}" id="card_${s.id}">
+      <div class="shipment-header">
         <div>
-          <div class="entry-frame">${e.size} • ${e.shape} • ${e.mattress}</div>
-          <div class="entry-meta">${dt}</div>
+          <div class="shipment-dt">${dt}</div>
+          <div class="shipment-vehicle">${s.vehicle?'🚛 '+s.vehicle:'No vehicle recorded'}</div>
+          <div class="shipment-id">${s.id}</div>
         </div>
-        ${statusBadge}
+        ${badge}
       </div>
-      <div class="entry-detail-row">
-        <div class="entry-detail">Pieces: <strong>${e.pieces}</strong></div>
-        ${e.vehicle ? `<div class="entry-detail">Vehicle: <strong>${e.vehicle}</strong></div>` : ''}
-        ${e.notes ? `<div class="entry-detail">Notes: <strong>${e.notes}</strong></div>` : ''}
-      </div>
+      <table class="sku-table">
+        <thead><tr><th>Size</th><th>Shape</th><th>Mattress</th><th>Pcs</th></tr></thead>
+        <tbody>${skuRows}</tbody>
+      </table>
+      <div class="total-row"><span>Total Pieces</span><strong>${totalPieces}</strong></div>
+      ${s.notes?`<div style="font-size:12px;color:var(--text2);margin-top:8px;">📝 ${s.notes}</div>`:''}
       ${photoHTML}
       ${auditHTML}
       ${actions}
     </div>`;
 }
 
-// ═══════════════════════════════════════════════
-// EDIT ENTRY
-// ═══════════════════════════════════════════════
+// ── EDIT ──────────────────────────────────────────
 function openEdit(id) {
-  editingEntryId = id;
-  const e = entries.find(x => x.id === id);
-  if (!e) return;
-  document.getElementById('editModalBody').innerHTML = `
-    <div class="field-group">
-      <div class="field-label">Frame</div>
-      <div style="font-size:14px; font-weight:600; color:var(--text); padding:10px 0;">${e.size} • ${e.shape} • ${e.mattress}</div>
-      <div style="font-size:12px; color:var(--text3);">Frame selection cannot be changed. Delete and re-enter if needed.</div>
-    </div>
-    <div class="field-group">
-      <div class="field-label">Pieces <span class="req">*</span></div>
-      <input type="number" id="editPieces" value="${e.pieces}" min="1">
+  editingId=id;
+  const s=shipments.find(x=>x.id===id); if(!s) return;
+  document.getElementById('editModalBody').innerHTML=`
+    <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:12px;margin-bottom:16px;">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">FRAME LINE ITEMS</div>
+      <div style="font-size:13px;color:var(--text2);">Frame selection is locked. Delete and re-enter to change frames.</div>
+      ${(s.lineItems||[]).map(l=>`<div style="font-size:13px;color:var(--text);margin-top:6px;font-weight:600;">${l.size} • ${l.shape} • ${l.mattress} — ${l.pieces} pcs</div>`).join('')}
     </div>
     <div class="field-group">
       <div class="field-label">Vehicle Number</div>
-      <input type="text" id="editVehicle" value="${e.vehicle || ''}">
+      <input type="text" id="editVehicle" value="${s.vehicle||''}">
     </div>
     <div class="field-group">
       <div class="field-label">Notes</div>
-      <textarea id="editNotes" rows="3">${e.notes || ''}</textarea>
-    </div>
-  `;
+      <textarea id="editNotes" rows="3">${s.notes||''}</textarea>
+    </div>`;
   document.getElementById('editModal').classList.add('open');
 }
 
 async function saveEdit() {
-  const e = entries.find(x => x.id === editingEntryId);
-  if (!e) return;
-  const newPieces = parseInt(document.getElementById('editPieces').value);
-  if (!newPieces || newPieces < 1) { showToast('Enter valid pieces', 'error'); return; }
-
-  const auditLine = `Edited ${new Date().toLocaleString('en-IN')} — Pieces: ${e.pieces}→${newPieces}, Vehicle: "${e.vehicle||''}"→"${document.getElementById('editVehicle').value.trim()}"`;
-  e.audit = e.audit || [];
-  e.audit.push(auditLine);
-  e.pieces = newPieces;
-  e.vehicle = document.getElementById('editVehicle').value.trim();
-  e.notes = document.getElementById('editNotes').value.trim();
-  e.status = 'edited';
-
+  const s=shipments.find(x=>x.id===editingId); if(!s) return;
+  const newVehicle=document.getElementById('editVehicle').value.trim();
+  const newNotes=document.getElementById('editNotes').value.trim();
+  s.audit=s.audit||[];
+  s.audit.push(`Edited ${new Date().toLocaleString('en-IN')} — Vehicle: "${s.vehicle||''}"→"${newVehicle}", Notes: "${s.notes||''}"→"${newNotes}"`);
+  s.vehicle=newVehicle; s.notes=newNotes; s.status='edited';
   try {
     await saveDB();
-    closeModal('editModal');
-    renderLog();
-    renderManager();
-    showToast('Entry updated ✓', 'success');
-  } catch(err) {
-    showToast('Error saving', 'error');
-  }
+    closeModal('editModal'); renderLog(); renderManager();
+    showToast('Shipment updated ✓','success');
+  } catch(e) { showToast('Error saving','error'); }
 }
 
-// ═══════════════════════════════════════════════
-// DELETE ENTRY
-// ═══════════════════════════════════════════════
-async function deleteEntry(id) {
-  if (!confirm('Mark this entry as deleted? It will remain in the log with a deleted status.')) return;
-  const e = entries.find(x => x.id === id);
-  if (!e) return;
-  e.audit = e.audit || [];
-  e.audit.push(`Deleted ${new Date().toLocaleString('en-IN')}`);
-  e.status = 'deleted';
-  try {
-    await saveDB();
-    renderLog();
-    renderManager();
-    showToast('Entry deleted', 'success');
-  } catch(err) {
-    showToast('Error saving', 'error');
-  }
+// ── DELETE ────────────────────────────────────────
+async function deleteShipment(id) {
+  if (!confirm('Mark this shipment as deleted? The record will be kept.')) return;
+  const s=shipments.find(x=>x.id===id); if(!s) return;
+  s.audit=s.audit||[];
+  s.audit.push(`Deleted ${new Date().toLocaleString('en-IN')}`);
+  s.status='deleted';
+  try { await saveDB(); renderLog(); renderManager(); showToast('Shipment deleted','success'); }
+  catch(e) { showToast('Error saving','error'); }
 }
 
-// ═══════════════════════════════════════════════
-// EXPORT CSV
-// ═══════════════════════════════════════════════
+// ── EXPORT CSV ────────────────────────────────────
 function exportCSV() {
-  const headers = ['ID','Timestamp','Size','Shape','Mattress','Pieces','Vehicle','Notes','Status'];
-  const rows = entries.map(e => [
-    e.id, e.timestamp, e.size, e.shape, e.mattress, e.pieces, e.vehicle || '', e.notes || '', e.status
-  ]);
-  const csv = [headers, ...rows].map(r => r.map(v => `"${v}"`).join(',')).join('\n');
-  const a = document.createElement('a');
-  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-  a.download = `stocklens_export_${new Date().toISOString().slice(0,10)}.csv`;
+  const rows=[['Shipment ID','Timestamp','Vehicle','Size','Shape','Mattress','Pieces','Notes','Status']];
+  shipments.forEach(s=>{
+    (s.lineItems||[]).forEach(l=>{
+      rows.push([s.id,s.timestamp,s.vehicle||'',l.size,l.shape,l.mattress,l.pieces,s.notes||'',s.status]);
+    });
+  });
+  const csv=rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download=`stocklens_${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
 }
 
-// ═══════════════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════════════
+// ── UTILS ─────────────────────────────────────────
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-function openLightbox(src) {
-  document.getElementById('lightboxImg').src = src;
-  document.getElementById('lightbox').classList.add('open');
-}
+function openLightbox(src) { document.getElementById('lightboxImg').src=src; document.getElementById('lightbox').classList.add('open'); }
 function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
-
-function showToast(msg, type='') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show ' + type;
-  setTimeout(() => t.classList.remove('show'), 2800);
+function showToast(msg,type='') {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show '+(type||'');
+  setTimeout(()=>t.classList.remove('show'),2800);
 }
+
+// init
+renderLineItems();
+
 </script>
 <script src="https://accounts.google.com/gsi/client" async></script>
 </body>
