@@ -295,6 +295,16 @@ input[type="number"] { -moz-appearance: textfield; }
       <div class="photo-preview-row" id="proofPhotoPreview"></div>
     </div>
 
+    <!-- WEIGHT -->
+    <div class="section-title">Shipment Weight</div>
+    <div class="field-group">
+      <div class="field-label">Total Weight</div>
+      <div style="display:flex;align-items:center;gap:0;">
+        <input type="number" id="weightInput" placeholder="Enter weight" min="0" step="0.1" inputmode="decimal" style="border-radius:var(--radius-sm) 0 0 var(--radius-sm);border-right:none;">
+        <div style="background:var(--surface3);border:1.5px solid var(--border);border-left:none;border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:14px 16px;font-size:17px;font-weight:700;color:var(--text2);white-space:nowrap;">kg</div>
+      </div>
+    </div>
+
     <!-- NOTES -->
     <div class="section-title">Notes</div>
     <div class="field-group">
@@ -702,6 +712,7 @@ async function submitShipment() {
       lineItems:[...lineItems],
       vehicle: document.getElementById('vehicleInput').value.trim(),
       vehiclePhotoId, proofPhotoIds,
+      weight: document.getElementById('weightInput').value.trim() ? parseFloat(document.getElementById('weightInput').value) : null,
       notes: document.getElementById('notesInput').value.trim(),
       status:'active', audit:[],
       _vehiclePhotoData: vehiclePhotoData,
@@ -720,6 +731,7 @@ async function submitShipment() {
 function resetForm() {
   lineItems=[]; vehiclePhotoData=null; proofPhotosData=[];
   document.getElementById('vehicleInput').value='';
+  document.getElementById('weightInput').value='';
   document.getElementById('notesInput').value='';
   document.getElementById('vehiclePhotoPreview').innerHTML='';
   document.getElementById('proofPhotoPreview').innerHTML='';
@@ -814,9 +826,10 @@ function renderManager() {
     group.forEach(function(s) {
       var timeStr = new Date(s.timestamp).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
       var lineStr = (s.lineItems||[]).map(function(l){return '<div style="font-size:12px;color:var(--text);margin-top:4px;font-weight:600;">'+l.size+' \u2022 '+l.shape+' \u2022 '+l.mattress+' \u2014 '+l.pieces+' pcs</div>';}).join('');
+      var weightStr = s.weight ? '<span style="font-size:11px;color:var(--text3);margin-left:8px;">\u2696\uFE0F '+s.weight+' kg</span>' : '';
       shipRows += '<div style="flex:1;min-width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:6px;">'
         +'<div style="display:flex;justify-content:space-between;align-items:center;">'
-        +'<div style="font-size:12px;color:var(--text2);">'+(s.vehicle?'\uD83D\uDE9B '+s.vehicle:'No vehicle')+'</div>'
+        +'<div style="font-size:12px;color:var(--text2);">'+(s.vehicle?'\uD83D\uDE9B '+s.vehicle:'No vehicle')+weightStr+'</div>'
         +'<div style="font-size:11px;color:var(--text3);">'+timeStr+'</div>'
         +'</div>'+lineStr+'</div>';
     });
@@ -849,6 +862,7 @@ function filterManager(f,el) {
 function shipmentCardHTML(s) {
   const dt = s.timestamp ? new Date(s.timestamp).toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '--';
   const badge = `<span class="entry-badge badge-${s.status}">${s.status.charAt(0).toUpperCase()+s.status.slice(1)}</span>`;
+  const weightBadge = s.weight ? `<span style="font-size:12px;color:var(--text2);font-weight:600;">⚖️ ${s.weight} kg</span>` : '';
   const items = s.lineItems||[];
   const totalPieces = items.reduce((a,l)=>a+l.pieces,0);
   const skuRows = items.map(l=>`
@@ -873,7 +887,7 @@ function shipmentCardHTML(s) {
       <div class="shipment-header">
         <div>
           <div class="shipment-dt">${dt}</div>
-          <div class="shipment-vehicle">${s.vehicle?'🚛 '+s.vehicle:'No vehicle recorded'}</div>
+          <div class="shipment-vehicle">${s.vehicle?'🚛 '+s.vehicle:'No vehicle recorded'} ${weightBadge}</div>
           <div class="shipment-id">${s.id}</div>
         </div>
         ${badge}
@@ -938,10 +952,10 @@ async function deleteShipment(id) {
 
 // ── EXPORT CSV ────────────────────────────────────
 function exportCSV() {
-  const rows=[['Shipment ID','Timestamp','Vehicle','Size','Shape','Mattress','Pieces','Notes','Status']];
+  const rows=[['Shipment ID','Timestamp','Vehicle','Weight (kg)','Size','Shape','Mattress','Pieces','Notes','Status']];
   shipments.forEach(s=>{
     (s.lineItems||[]).forEach(l=>{
-      rows.push([s.id,s.timestamp,s.vehicle||'',l.size,l.shape,l.mattress,l.pieces,s.notes||'',s.status]);
+      rows.push([s.id,s.timestamp,s.vehicle||'',s.weight||'',l.size,l.shape,l.mattress,l.pieces,s.notes||'',s.status]);
     });
   });
   const csv=rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
