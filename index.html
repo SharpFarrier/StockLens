@@ -232,6 +232,7 @@ input[type="number"] { -moz-appearance: textfield; }
       <button class="nav-tab active" onclick="showPage('entry', this)">Entry</button>
       <button class="nav-tab" onclick="showPage('log', this)">Log</button>
       <button class="nav-tab" onclick="showPage('manager', this)">Manager</button>
+      <button class="nav-tab" id="catalogueTab" style="display:none" onclick="showPage('catalogue', this)">Catalogue</button>
     </div>
   </div>
 
@@ -378,6 +379,16 @@ input[type="number"] { -moz-appearance: textfield; }
   </div>
 </div>
 
+  <!-- CATALOGUE PAGE -->
+  <div id="page-catalogue" class="page">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+      <div class="section-title" style="margin:0;">Frame Catalogue</div>
+      <button class="btn-secondary" onclick="saveCatalogue()" id="saveCatalogueBtn" style="font-size:12px;padding:8px 14px;">Save Changes</button>
+    </div>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">Configure which shapes are available per size and mattress availability.</div>
+    <div id="catalogueEditor"></div>
+  </div>
+
 <!-- EDIT MODAL -->
 <div class="modal-overlay" id="editModal">
   <div class="modal">
@@ -421,8 +432,10 @@ const SHAPE_IMAGES = {
 
 // ── CONFIG ──────────────────────────────────────
 const CLIENT_ID = '801481705797-g3fpo65r67n8437eti5lknpa6gqcvf3e.apps.googleusercontent.com';
-const FOLDER_ID = '1hqiHgj4uhYxGYL3g2CaCsX1ICxeHWyEN';
-const DB_FILE   = 'stocklens_db.json';
+const FOLDER_ID      = '1hqiHgj4uhYxGYL3g2CaCsX1ICxeHWyEN';
+const DB_FILE        = 'stocklens_db.json';
+const CATALOGUE_FILE = 'stocklens_frames.json';
+const OWNER_EMAIL    = 'adityaramnani91581@gmail.com';
 const SCOPES    = 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.email';
 
 // ── FRAME CATALOGUE ──────────────────────────────
@@ -454,6 +467,8 @@ let vehiclePhotoData  = null;
 let proofPhotosData   = [];
 let editingId     = null;
 let selectedSupplier = null;
+let isOwner = false;
+let catalogue = null;
 let logFilter     = 'all';
 let managerFilter = 'all';
 let photosFolderId = null;
@@ -477,6 +492,9 @@ function signIn() {
         document.getElementById('app').style.display = 'block';
         startClock();
         await loadShipments();
+        var ownerEmail2 = await fetchUserProfile();
+        await checkOwner(ownerEmail2);
+        await loadCatalogue();
       }
     }
   });
@@ -532,6 +550,7 @@ function showPage(name, el) {
   el.classList.add('active');
   if (name==='log') renderLog();
   if (name==='manager') renderManager();
+  if (name==='catalogue') renderCatalogueEditor();
 }
 
 // ── PANEL TOGGLE ─────────────────────────────────
@@ -1075,6 +1094,129 @@ function showToast(msg,type='') {
   t.textContent=msg; t.className='toast show '+(type||'');
   setTimeout(()=>t.classList.remove('show'),2800);
 }
+
+// ── CATALOGUE ─────────────────────────────────────
+
+function buildDefaultCatalogue() {
+  var DQK = ['Double 4ft','Queen 5ft','King 6ft'];
+  return { shapes: [
+    { id:'round',            label:'Round',            sizes:['Single 2.5ft','Single 3ft'], mattress:'both' },
+    { id:'square',           label:'Square',           sizes:['Single 2.5ft','Single 3ft'], mattress:'both' },
+    { id:'metal',            label:'Metal',            sizes:['Single 2.5ft','Single 3ft'], mattress:'without' },
+    { id:'headboard',        label:'Headboard',        sizes:['Single 3ft','Double 4ft','Queen 5ft','King 6ft'], mattress:'both' },
+    { id:'element',          label:'Element',          sizes:['Single 3ft','Double 4ft','Queen 5ft','King 6ft'], mattress:'both' },
+    { id:'trolley',          label:'Trolley',          sizes:['Single 3ft'], mattress:'both' },
+    { id:'golden',           label:'Golden',           sizes:DQK, mattress:'both' },
+    { id:'lg',               label:'LG',               sizes:DQK, mattress:'both' },
+    { id:'nesto',            label:'Nesto',            sizes:DQK, mattress:'both' },
+    { id:'oslo',             label:'Oslo',             sizes:DQK, mattress:'both' },
+    { id:'wooden_half_patti',label:'Wooden Half Patti',sizes:DQK, mattress:'both' },
+    { id:'wooden_full_patti',label:'Wooden Full Patti',sizes:DQK, mattress:'both' },
+  ]};
+}
+
+async function loadCatalogue() {
+  try {
+    var q = encodeURIComponent("name='" + CATALOGUE_FILE + "' and '" + FOLDER_ID + "' in parents and trashed=false");
+    var res = await fetch('https://www.googleapis.com/drive/v3/files?q=' + q + '&fields=files(id)',
+      { headers: { Authorization: 'Bearer ' + accessToken } });
+    var data = await res.json();
+    if (data.files && data.files.length > 0) {
+      var content = await fetch('https://www.googleapis.com/drive/v3/files/' + data.files[0].id + '?alt=media',
+        { headers: { Authorization: 'Bearer ' + accessToken } });
+      catalogue = await content.json();
+    } else {
+      catalogue = buildDefaultCatalogue();
+    }
+  } catch(e) { catalogue = buildDefaultCatalogue(); }
+  window.SHAPES_ACTIVE = catalogue.shapes;
+}
+
+async function saveCatalogue() {
+  var btn = document.getElementById('saveCatalogueBtn');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+  try {
+    var blob = new Blob([JSON.stringify(catalogue, null, 2)], { type: 'application/json' });
+    var q = encodeURIComponent("name='" + CATALOGUE_FILE + "' and '" + FOLDER_ID + "' in parents and trashed=false");
+    var res = await fetch('https://www.googleapis.com/drive/v3/files?q=' + q + '&fields=files(id)',
+      { headers: { Authorization: 'Bearer ' + accessToken } });
+    var data = await res.json();
+    if (data.files && data.files.length > 0) {
+      await fetch('https://www.googleapis.com/upload/drive/v3/files/' + data.files[0].id + '?uploadType=media',
+        { method: 'PATCH', headers: { Authorization: 'Bearer ' + accessToken, 'Content-Type': 'application/json' }, body: blob });
+    } else {
+      var meta = { name: CATALOGUE_FILE, parents: [FOLDER_ID] };
+      var form = new FormData();
+      form.append('metadata', new Blob([JSON.stringify(meta)], { type: 'application/json' }));
+      form.append('file', blob);
+      await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+        { method: 'POST', headers: { Authorization: 'Bearer ' + accessToken }, body: form });
+    }
+    window.SHAPES_ACTIVE = catalogue.shapes;
+    showToast('Catalogue saved ✓', 'success');
+  } catch(e) { showToast('Error saving catalogue', 'error'); }
+  btn.textContent = 'Save Changes'; btn.disabled = false;
+}
+
+function renderCatalogueEditor() {
+  if (!catalogue) return;
+  var ALL_SIZES = ['Single 2.5ft','Single 3ft','Double 4ft','Queen 5ft','King 6ft'];
+  var out = '';
+  ALL_SIZES.forEach(function(size) {
+    out += '<div class="cat-size-block"><div class="cat-size-header">' + size + '</div>';
+    catalogue.shapes.forEach(function(shape) {
+      var enabled = shape.sizes.includes(size);
+      var mattress = shape.mattress || 'both';
+      var sid = shape.id;
+      var ssz = size;
+      out += '<div class="cat-shape-row">';
+      out += '<img class="cat-shape-thumb" src="' + (SHAPE_IMAGES[shape.id] || '') + '" alt="' + shape.label + '">';
+      out += '<div class="cat-shape-name">' + shape.label + '</div>';
+      out += '<div class="cat-enabled"><span class="cat-enabled-label">' + (enabled ? 'ON' : 'OFF') + '</span>';
+      out += '<label class="switch"><input type="checkbox" ' + (enabled ? 'checked' : '') + ' data-shape="' + sid + '" data-size="' + ssz + '" onchange="toggleShapeSize(this)"><span class="slider"></span></label></div>';
+      if (enabled) {
+        out += '<div class="cat-toggle-group">';
+        out += '<button class="cat-toggle ' + (mattress === 'with' || mattress === 'both' ? 'on' : '') + '" data-shape="' + sid + '" data-type="with" onclick="toggleMattress(this)">W/ Matt</button>';
+        out += '<button class="cat-toggle ' + (mattress === 'without' || mattress === 'both' ? 'on' : '') + '" data-shape="' + sid + '" data-type="without" onclick="toggleMattress(this)">W/O Matt</button>';
+        out += '</div>';
+      }
+      out += '</div>';
+    });
+    out += '</div>';
+  });
+  document.getElementById('catalogueEditor').innerHTML = out;
+}
+
+function toggleShapeSize(el) {
+  var shapeId = el.getAttribute('data-shape');
+  var size    = el.getAttribute('data-size');
+  var enabled = el.checked;
+  var shape = catalogue.shapes.find(function(s){ return s.id === shapeId; });
+  if (!shape) return;
+  if (enabled) { if (!shape.sizes.includes(size)) shape.sizes.push(size); }
+  else { shape.sizes = shape.sizes.filter(function(s){ return s !== size; }); }
+  renderCatalogueEditor();
+}
+
+function toggleMattress(el) {
+  var shapeId = el.getAttribute('data-shape');
+  var type    = el.getAttribute('data-type');
+  var shape = catalogue.shapes.find(function(s){ return s.id === shapeId; });
+  if (!shape) return;
+  var cur = shape.mattress || 'both';
+  if (type === 'with') {
+    shape.mattress = (cur === 'both') ? 'without' : (cur === 'without' ? 'both' : 'without');
+  } else {
+    shape.mattress = (cur === 'both') ? 'with' : (cur === 'with' ? 'both' : 'with');
+  }
+  renderCatalogueEditor();
+}
+
+async function checkOwner(userEmail) {
+  isOwner = (userEmail === OWNER_EMAIL);
+  if (isOwner) document.getElementById('catalogueTab').style.display = 'block';
+}
+
 
 // init
 renderLineItems();
