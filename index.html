@@ -468,11 +468,12 @@ function signIn() {
 // ── ACCESS CHECK ─────────────────────────────────
 async function checkFolderAccess() {
   try {
-    const res = await fetch(
-      'https://www.googleapis.com/drive/v3/files/' + FOLDER_ID + '?fields=id,name',
-      { headers: { Authorization: 'Bearer ' + accessToken } }
-    );
-    return res.ok;
+    const query = encodeURIComponent("'" + FOLDER_ID + "' in parents");
+    const url = 'https://www.googleapis.com/drive/v3/files?q=' + query + '&pageSize=1&fields=files(id)';
+    const res = await fetch(url, { headers: { Authorization: 'Bearer ' + accessToken } });
+    if (!res.ok) return false;
+    const data = await res.json();
+    return Array.isArray(data.files);
   } catch(e) {
     return false;
   }
