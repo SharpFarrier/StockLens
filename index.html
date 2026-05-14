@@ -749,9 +749,7 @@ async function submitShipment() {
       vehiclePhotoId, proofPhotoIds,
       weight: document.getElementById('weightInput').value.trim() ? parseFloat(document.getElementById('weightInput').value) : null,
       notes: document.getElementById('notesInput').value.trim(),
-      status:'active', audit:[],
-      _vehiclePhotoData: vehiclePhotoData,
-      _proofPhotosData: [...proofPhotosData]
+      status:'active', audit:[]
     };
     shipments.unshift(shipment);
     await saveDB();
@@ -792,6 +790,7 @@ function renderLog() {
     list.innerHTML='<div class="empty-state"><div class="icon">📋</div><p>No shipments yet</p></div>'; return;
   }
   list.innerHTML = filtered.map(s=>shipmentCardHTML(s)).join('');
+  setTimeout(loadPhotosForVisible, 100);
 }
 
 function filterLog(f,el) {
@@ -887,6 +886,7 @@ function renderManager() {
   });
 
   list.innerHTML = out;
+  setTimeout(loadPhotosForVisible, 100);
 }
 
 function filterManager(f,el) {
@@ -911,10 +911,14 @@ function shipmentCardHTML(s) {
       <td>${l.mattress}</td>
       <td>${l.pieces}</td>
     </tr>`).join('');
-  const photos = [];
-  if (s._vehiclePhotoData) photos.push(s._vehiclePhotoData);
-  if (s._proofPhotosData) photos.push(...s._proofPhotosData);
-  const photoHTML = photos.length>0 ? `<div class="shipment-photos">${photos.map(p=>`<img class="shipment-photo" src="${p}" onclick="openLightbox('${p}')">`).join('')}</div>` : '';
+  const allPhotoIds = [];
+  if (s.vehiclePhotoId) allPhotoIds.push(s.vehiclePhotoId);
+  if (s.proofPhotoIds && s.proofPhotoIds.length) allPhotoIds.push(...s.proofPhotoIds);
+  const photoHTML = allPhotoIds.length > 0
+    ? '<div class="shipment-photos" id="photos_' + s.id + '">' +
+      allPhotoIds.map(pid => '<img class="shipment-photo" id="photo_' + pid + '" src="" onclick="openLightbox(this.src)" style="background:var(--surface3);">').join('') +
+      '</div>'
+    : '';
   const auditHTML = s.audit&&s.audit.length>0 ? s.audit.map(a=>`<div class="audit-row">${a}</div>`).join('') : '';
   const actions = s.status!=='deleted' ? `
     <div class="shipment-actions">
@@ -1007,6 +1011,25 @@ function exportCSV() {
 
 // ── UTILS ─────────────────────────────────────────
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+async function loadPhotosForVisible() {
+  // Find all photo img tags with empty src and load from Drive
+  const imgs = document.querySelectorAll('.shipment-photo[src=""]');
+  for (const img of imgs) {
+    const photoId = img.id.replace('photo_', '');
+    if (!photoId || !accessToken) continue;
+    try {
+      const res = await fetch(
+        'https://www.googleapis.com/drive/v3/files/' + photoId + '?alt=media',
+        { headers: { Authorization: 'Bearer ' + accessToken } }
+      );
+      if (res.ok) {
+        const blob = await res.blob();
+        img.src = URL.createObjectURL(blob);
+      }
+    } catch(e) { console.warn('Photo load failed', photoId); }
+  }
+}
 function openLightbox(src) { document.getElementById('lightboxImg').src=src; document.getElementById('lightbox').classList.add('open'); }
 function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
 function showToast(msg,type='') {
