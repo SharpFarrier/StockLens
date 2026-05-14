@@ -283,6 +283,20 @@ input[type="number"] { -moz-appearance: textfield; }
       <div class="photo-preview-row" id="vehiclePhotoPreview"></div>
     </div>
 
+    <!-- SUPPLIER -->
+    <div class="section-title">Supplier</div>
+    <div class="field-group">
+      <div class="field-label">Stock Received From <span class="req">*</span></div>
+      <div class="toggle-row" style="grid-template-columns:1fr 1fr 1fr;">
+        <div class="toggle-btn" onclick="selectSupplier(this,'Bunty')">Bunty</div>
+        <div class="toggle-btn" onclick="selectSupplier(this,'Mahinder')">Mahinder</div>
+        <div class="toggle-btn" onclick="selectSupplier(this,'Other')">Other</div>
+      </div>
+      <div id="supplierOtherWrap" style="display:none;margin-top:10px;">
+        <input type="text" id="supplierOtherInput" placeholder="Enter supplier name">
+      </div>
+    </div>
+
     <!-- PROOF PHOTOS -->
     <div class="section-title">Proof Photos</div>
     <div class="field-group">
@@ -421,6 +435,7 @@ let draftMattress = null;
 let vehiclePhotoData  = null;
 let proofPhotosData   = [];
 let editingId     = null;
+let selectedSupplier = null;
 let logFilter     = 'all';
 let managerFilter = 'all';
 let photosFolderId = null;
@@ -518,11 +533,25 @@ function resetDraft() {
   draftSize=null; draftShape=null; draftMattress=null;
   document.querySelectorAll('#sizeRow .pill').forEach(p=>p.classList.remove('selected'));
   document.querySelectorAll('.shape-card').forEach(c=>c.classList.remove('selected'));
-  document.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('selected'));
+  document.querySelectorAll('#panelBody .toggle-btn').forEach(b=>b.classList.remove('selected'));
   document.getElementById('piecesInput').value='';
   document.getElementById('shapeStep').style.display='none';
   document.getElementById('mattressStep').style.display='none';
   document.getElementById('piecesStep').style.display='none';
+}
+
+function selectSupplier(el, name) {
+  selectedSupplier = name;
+  document.querySelectorAll('.field-group .toggle-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  const otherWrap = document.getElementById('supplierOtherWrap');
+  if (name === 'Other') {
+    otherWrap.style.display = 'block';
+    document.getElementById('supplierOtherInput').focus();
+  } else {
+    otherWrap.style.display = 'none';
+    document.getElementById('supplierOtherInput').value = '';
+  }
 }
 
 // ── FRAME PICKER ─────────────────────────────────
@@ -698,6 +727,10 @@ async function saveDB() {
 // ── SUBMIT ────────────────────────────────────────
 async function submitShipment() {
   if (lineItems.length===0) { showToast('Add at least one frame','error'); return; }
+  if (!selectedSupplier) { showToast('Select a supplier','error'); return; }
+  const supplierName = selectedSupplier === 'Other'
+    ? (document.getElementById('supplierOtherInput').value.trim() || 'Other')
+    : selectedSupplier;
   const btn = document.getElementById('submitBtn');
   btn.disabled=true; btn.innerHTML='<span class="spinner"></span>';
   try {
@@ -710,6 +743,7 @@ async function submitShipment() {
     const shipment = {
       id:sid, timestamp:now,
       lineItems:[...lineItems],
+      supplier: supplierName,
       vehicle: document.getElementById('vehicleInput').value.trim(),
       vehiclePhotoId, proofPhotoIds,
       weight: document.getElementById('weightInput').value.trim() ? parseFloat(document.getElementById('weightInput').value) : null,
@@ -730,6 +764,10 @@ async function submitShipment() {
 
 function resetForm() {
   lineItems=[]; vehiclePhotoData=null; proofPhotosData=[];
+  selectedSupplier = null;
+  document.querySelectorAll('.field-group .toggle-btn').forEach(function(b){b.classList.remove('selected');});
+  document.getElementById('supplierOtherWrap').style.display='none';
+  document.getElementById('supplierOtherInput').value='';
   document.getElementById('vehicleInput').value='';
   document.getElementById('weightInput').value='';
   document.getElementById('notesInput').value='';
@@ -829,7 +867,7 @@ function renderManager() {
       var weightStr = s.weight ? '<span style="font-size:11px;color:var(--text3);margin-left:8px;">\u2696\uFE0F '+s.weight+' kg</span>' : '';
       shipRows += '<div style="flex:1;min-width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:6px;">'
         +'<div style="display:flex;justify-content:space-between;align-items:center;">'
-        +'<div style="font-size:12px;color:var(--text2);">'+(s.vehicle?'\uD83D\uDE9B '+s.vehicle:'No vehicle')+weightStr+'</div>'
+        +'<div style="font-size:12px;color:var(--text2);">'+(s.supplier?'\uD83C\uDFED '+s.supplier+'  ':'')+''+(s.vehicle?'\uD83D\uDE9B '+s.vehicle:'')+weightStr+'</div>'
         +'<div style="font-size:11px;color:var(--text3);">'+timeStr+'</div>'
         +'</div>'+lineStr+'</div>';
     });
@@ -887,7 +925,8 @@ function shipmentCardHTML(s) {
       <div class="shipment-header">
         <div>
           <div class="shipment-dt">${dt}</div>
-          <div class="shipment-vehicle">${s.vehicle?'🚛 '+s.vehicle:'No vehicle recorded'} ${weightBadge}</div>
+          <div class="shipment-vehicle">${s.supplier?'🏭 '+s.supplier+' &nbsp;':''} ${s.vehicle?'🚛 '+s.vehicle:''}</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:2px;">${weightBadge}</div>
           <div class="shipment-id">${s.id}</div>
         </div>
         ${badge}
@@ -952,10 +991,10 @@ async function deleteShipment(id) {
 
 // ── EXPORT CSV ────────────────────────────────────
 function exportCSV() {
-  const rows=[['Shipment ID','Timestamp','Vehicle','Weight (kg)','Size','Shape','Mattress','Pieces','Notes','Status']];
+  const rows=[['Shipment ID','Timestamp','Supplier','Vehicle','Weight (kg)','Size','Shape','Mattress','Pieces','Notes','Status']];
   shipments.forEach(s=>{
     (s.lineItems||[]).forEach(l=>{
-      rows.push([s.id,s.timestamp,s.vehicle||'',s.weight||'',l.size,l.shape,l.mattress,l.pieces,s.notes||'',s.status]);
+      rows.push([s.id,s.timestamp,s.supplier||'',s.vehicle||'',s.weight||'',l.size,l.shape,l.mattress,l.pieces,s.notes||'',s.status]);
     });
   });
   const csv=rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
