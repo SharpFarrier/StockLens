@@ -648,6 +648,13 @@ function selectShape(el, id, label) {
   document.querySelectorAll('.shape-card').forEach(function(c){c.classList.remove('selected');});
   el.classList.add('selected');
   var mattressType = getMattressOptions(draftCategory||'bed', draftSize, id);
+  if (mattressType === 'none') {
+    document.getElementById('mattressStep').style.display = 'none';
+    document.getElementById('piecesStep').style.display = 'block';
+    if (document.getElementById('piecesInput')) document.getElementById('piecesInput').focus();
+    draftMattress = 'N/A';
+    return;
+  }
   var mattressRow = document.querySelector('#mattressStep .toggle-row');
   var withBtn    = '<div class="toggle-btn" onclick="selectMattress(this,&quot;With Mattress&quot;)">With Mattress</div>';
   var withoutBtn = '<div class="toggle-btn" onclick="selectMattress(this,&quot;Without Mattress&quot;)">Without Mattress</div>';
