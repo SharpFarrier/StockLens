@@ -633,6 +633,16 @@ function selectSize(el, size) {
   document.getElementById('mattressStep').style.display = 'none';
   document.getElementById('piecesStep').style.display = 'none';
 }
+function renderShapeGrid(size) {
+  var catId = draftCategory || 'bed';
+  var available = getShapesForCategorySize(catId, size);
+  document.getElementById('shapeGrid').innerHTML = available.map(function(s) {
+    return '<div class="shape-card" id="sc_' + s.id + '" onclick="selectShape(this,\'' + s.id + '\',\'' + s.label + '\')">'
+      + '<img src="' + (SHAPE_IMAGES[s.id]||'') + '" alt="' + s.label + '" loading="lazy">'
+      + '<div class="shape-card-label">' + s.label + '</div></div>';
+  }).join('');
+}
+
 function selectShape(el, id, label) {
   draftShape=label; draftShapeId=id; draftMattress=null;
   document.querySelectorAll('.shape-card').forEach(function(c){c.classList.remove('selected');});
