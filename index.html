@@ -608,26 +608,21 @@ function selectSupplier(el, name) {
 // ── FRAME PICKER ─────────────────────────────────
 function selectCategory(el, catId) {
   draftCategory = catId; draftSize = null; draftShape = null; draftMattress = null; draftShapeId = null;
-  document.querySelectorAll('#categoryRow .pill').forEach(function(p){p.classList.remove('selected');});
+  document.querySelectorAll('#categoryRow .pill').forEach(function(p){ p.classList.remove('selected'); });
   el.classList.add('selected');
+  document.querySelectorAll('#sizeRow .pill').forEach(function(p){ p.classList.remove('selected'); });
+  document.getElementById('shapeStep').style.display = 'none';
+  document.getElementById('mattressStep').style.display = 'none';
+  document.getElementById('piecesStep').style.display = 'none';
   var catDef = getCategoryDef(catId);
   if (catDef.hasSizes) {
     document.getElementById('sizeStep').style.display = 'block';
-    document.querySelectorAll('#categoryRow .pill, #sizeRow .pill').forEach(function(p){p.classList.remove('selected');});
-  if(document.getElementById('sizeStep')) document.getElementById('sizeStep').style.display='none';
-    document.getElementById('shapeStep').style.display = 'none';
-    document.getElementById('mattressStep').style.display = 'none';
-    document.getElementById('piecesStep').style.display = 'none';
   } else {
-    // No sizes — go straight to shape
     document.getElementById('sizeStep').style.display = 'none';
     document.getElementById('shapeStep').style.display = 'block';
-    document.getElementById('mattressStep').style.display = 'none';
-    document.getElementById('piecesStep').style.display = 'none';
     renderShapeGrid(null);
   }
 }
-
 function selectSize(el, size) {
   draftSize = size; draftShape = null; draftMattress = null; draftShapeId = null;
   if (!draftCategory) draftCategory = 'bed';
