@@ -470,7 +470,6 @@ let proofPhotosData   = [];
 let editingId     = null;
 let selectedSupplier = null;
 let isOwner = false;
-let catalogue = null;
 let logFilter     = 'all';
 let managerFilter = 'all';
 let photosFolderId = null;
@@ -606,24 +605,21 @@ function selectSize(el, size) {
 }
 
 function renderShapeGrid(size) {
-  const available = SHAPES.filter(s=>s.sizes.includes(size));
-  document.getElementById('shapeGrid').innerHTML = available.map(s=>`
-    <div class="shape-card" id="sc_${s.id}" onclick="selectShape(this,'${s.id}','${s.label}')">
-      <img src="${SHAPE_IMAGES[s.id]}" alt="${s.label}" loading="lazy">
-      <div class="shape-card-label">${s.label}</div>
-    </div>`).join('');
+  var available = getShapesForSize(size);
+  document.getElementById('shapeGrid').innerHTML = available.map(function(s) {
+    return '<div class="shape-card" id="sc_' + s.id + '" onclick="selectShape(this,\'' + s.id + '\',\'' + s.label + '\')">'
+      + '<img src="' + (SHAPE_IMAGES[s.id]||'') + '" alt="' + s.label + '" loading="lazy">'
+      + '<div class="shape-card-label">' + s.label + '</div></div>';
+  }).join('');
 }
-
 function selectShape(el, id, label) {
-  draftShape=label; draftMattress=null; draftShapeId=id;
-  document.querySelectorAll('.shape-card').forEach(c=>c.classList.remove('selected'));
+  draftShape=label; draftShapeId=id; draftMattress=null;
+  document.querySelectorAll('.shape-card').forEach(function(c){c.classList.remove('selected');});
   el.classList.add('selected');
-  var sourceShapes = (window.SHAPES_ACTIVE || SHAPES);
-  var shapeDef = sourceShapes.find(function(s){ return s.id === id; });
-  var mattressType = shapeDef ? (shapeDef.mattress || 'both') : 'both';
+  var mattressType = getMattressOptions(draftSize, id);
   var mattressRow = document.querySelector('#mattressStep .toggle-row');
-  var withBtn    = '<div class="toggle-btn" onclick="selectMattress(this,&#39;With Mattress&#39;)">With Mattress</div>';
-  var withoutBtn = '<div class="toggle-btn" onclick="selectMattress(this,&#39;Without Mattress&#39;)">Without Mattress</div>';
+  var withBtn    = '<div class="toggle-btn" onclick="selectMattress(this,&quot;With Mattress&quot;)">With Mattress</div>';
+  var withoutBtn = '<div class="toggle-btn" onclick="selectMattress(this,&quot;Without Mattress&quot;)">Without Mattress</div>';
   if (mattressType === 'with') {
     mattressRow.innerHTML = withBtn;
     document.getElementById('mattressStep').style.display='block';
@@ -642,7 +638,6 @@ function selectShape(el, id, label) {
   document.getElementById('mattressStep').style.display='block';
   document.getElementById('piecesStep').style.display='none';
 }
-
 function selectMattress(el, val) {
   draftMattress=val;
   document.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('selected'));
@@ -1099,23 +1094,75 @@ function showToast(msg,type='') {
 
 // ── CATALOGUE ─────────────────────────────────────
 
-function buildDefaultCatalogue() {
-  var DQK = ['Double 4ft','Queen 5ft','King 6ft'];
-  return { shapes: [
-    { id:'round',            label:'Round',            sizes:['Single 2.5ft','Single 3ft'], mattress:'both' },
-    { id:'square',           label:'Square',           sizes:['Single 2.5ft','Single 3ft'], mattress:'both' },
-    { id:'metal',            label:'Metal',            sizes:['Single 2.5ft','Single 3ft'], mattress:'without' },
-    { id:'headboard',        label:'Headboard',        sizes:['Single 3ft','Double 4ft','Queen 5ft','King 6ft'], mattress:'both' },
-    { id:'element',          label:'Element',          sizes:['Single 3ft','Double 4ft','Queen 5ft','King 6ft'], mattress:'both' },
-    { id:'trolley',          label:'Trolley',          sizes:['Single 3ft'], mattress:'both' },
-    { id:'golden',           label:'Golden',           sizes:DQK, mattress:'both' },
-    { id:'lg',               label:'LG',               sizes:DQK, mattress:'both' },
-    { id:'nesto',            label:'Nesto',            sizes:DQK, mattress:'both' },
-    { id:'oslo',             label:'Oslo',             sizes:DQK, mattress:'both' },
-    { id:'wooden_half_patti',label:'Wooden Half Patti',sizes:DQK, mattress:'both' },
-    { id:'wooden_full_patti',label:'Wooden Full Patti',sizes:DQK, mattress:'both' },
-    { id:'base',             label:'Base',             sizes:['Single 2.5ft','Single 3ft','Double 4ft','Queen 5ft','King 6ft'], mattress:'both' },
-  ]};
+
+// ── CATALOGUE SYSTEM ──────────────────────────────
+
+const DEFAULT_CATALOGUE = {
+  "combinations": [
+    {"size":"Single 2.5ft","shape":"round",            "shapeLabel":"Round",            "mattress":"both",    "active":true},
+    {"size":"Single 2.5ft","shape":"square",           "shapeLabel":"Square",           "mattress":"both",    "active":true},
+    {"size":"Single 2.5ft","shape":"metal",            "shapeLabel":"Metal",            "mattress":"without", "active":true},
+    {"size":"Single 3ft",  "shape":"round",            "shapeLabel":"Round",            "mattress":"both",    "active":true},
+    {"size":"Single 3ft",  "shape":"square",           "shapeLabel":"Square",           "mattress":"both",    "active":true},
+    {"size":"Single 3ft",  "shape":"metal",            "shapeLabel":"Metal",            "mattress":"without", "active":true},
+    {"size":"Single 3ft",  "shape":"headboard",        "shapeLabel":"Headboard",        "mattress":"both",    "active":true},
+    {"size":"Single 3ft",  "shape":"element",          "shapeLabel":"Element",          "mattress":"both",    "active":true},
+    {"size":"Single 3ft",  "shape":"trolley",          "shapeLabel":"Trolley",          "mattress":"with",    "active":true},
+    {"size":"Double 4ft",  "shape":"headboard",        "shapeLabel":"Headboard",        "mattress":"both",    "active":true},
+    {"size":"Double 4ft",  "shape":"element",          "shapeLabel":"Element",          "mattress":"both",    "active":true},
+    {"size":"Double 4ft",  "shape":"oslo",             "shapeLabel":"Oslo",             "mattress":"both",    "active":true},
+    {"size":"Double 4ft",  "shape":"golden",           "shapeLabel":"Golden",           "mattress":"both",    "active":true},
+    {"size":"Double 4ft",  "shape":"nesto",            "shapeLabel":"Nesto",            "mattress":"both",    "active":true},
+    {"size":"Double 4ft",  "shape":"lg",               "shapeLabel":"LG",               "mattress":"both",    "active":true},
+    {"size":"Double 4ft",  "shape":"wooden_half_patti","shapeLabel":"Wooden Half Patti","mattress":"both",    "active":true},
+    {"size":"Double 4ft",  "shape":"wooden_full_patti","shapeLabel":"Wooden Full Patti","mattress":"both",    "active":true},
+    {"size":"Double 4ft",  "shape":"base",             "shapeLabel":"Base",             "mattress":"both",    "active":true},
+    {"size":"Queen 5ft",   "shape":"headboard",        "shapeLabel":"Headboard",        "mattress":"both",    "active":true},
+    {"size":"Queen 5ft",   "shape":"element",          "shapeLabel":"Element",          "mattress":"both",    "active":true},
+    {"size":"Queen 5ft",   "shape":"oslo",             "shapeLabel":"Oslo",             "mattress":"both",    "active":true},
+    {"size":"Queen 5ft",   "shape":"golden",           "shapeLabel":"Golden",           "mattress":"both",    "active":true},
+    {"size":"Queen 5ft",   "shape":"nesto",            "shapeLabel":"Nesto",            "mattress":"both",    "active":true},
+    {"size":"Queen 5ft",   "shape":"lg",               "shapeLabel":"LG",               "mattress":"both",    "active":true},
+    {"size":"Queen 5ft",   "shape":"wooden_half_patti","shapeLabel":"Wooden Half Patti","mattress":"both",    "active":true},
+    {"size":"Queen 5ft",   "shape":"wooden_full_patti","shapeLabel":"Wooden Full Patti","mattress":"both",    "active":true},
+    {"size":"Queen 5ft",   "shape":"base",             "shapeLabel":"Base",             "mattress":"both",    "active":true},
+    {"size":"King 6ft",    "shape":"headboard",        "shapeLabel":"Headboard",        "mattress":"both",    "active":true},
+    {"size":"King 6ft",    "shape":"element",          "shapeLabel":"Element",          "mattress":"both",    "active":true},
+    {"size":"King 6ft",    "shape":"oslo",             "shapeLabel":"Oslo",             "mattress":"both",    "active":true},
+    {"size":"King 6ft",    "shape":"golden",           "shapeLabel":"Golden",           "mattress":"both",    "active":true},
+    {"size":"King 6ft",    "shape":"nesto",            "shapeLabel":"Nesto",            "mattress":"both",    "active":true},
+    {"size":"King 6ft",    "shape":"lg",               "shapeLabel":"LG",               "mattress":"both",    "active":true},
+    {"size":"King 6ft",    "shape":"wooden_half_patti","shapeLabel":"Wooden Half Patti","mattress":"both",    "active":true},
+    {"size":"King 6ft",    "shape":"wooden_full_patti","shapeLabel":"Wooden Full Patti","mattress":"both",    "active":true},
+    {"size":"King 6ft",    "shape":"base",             "shapeLabel":"Base",             "mattress":"both",    "active":true}
+  ]
+};
+
+// Active catalogue (loaded from Drive or default)
+var activeCatalogue = null;
+
+// Get active shapes for a given size
+function getShapesForSize(size) {
+  var cat = activeCatalogue || DEFAULT_CATALOGUE;
+  var seen = {};
+  var result = [];
+  cat.combinations.forEach(function(c) {
+    if (c.size === size && c.active !== false && !seen[c.shape]) {
+      seen[c.shape] = true;
+      result.push({ id: c.shape, label: c.shapeLabel });
+    }
+  });
+  return result;
+}
+
+// Get mattress options for a size+shape combo
+function getMattressOptions(size, shapeId) {
+  var cat = activeCatalogue || DEFAULT_CATALOGUE;
+  var combos = cat.combinations.filter(function(c) {
+    return c.size === size && c.shape === shapeId && c.active !== false;
+  });
+  if (combos.length === 0) return 'both';
+  return combos[0].mattress;
 }
 
 async function loadCatalogue() {
@@ -1127,25 +1174,37 @@ async function loadCatalogue() {
     if (data.files && data.files.length > 0) {
       var content = await fetch('https://www.googleapis.com/drive/v3/files/' + data.files[0].id + '?alt=media',
         { headers: { Authorization: 'Bearer ' + accessToken } });
-      catalogue = await content.json();
+      var loaded = await content.json();
+      // Support both old shape-based format and new combinations format
+      if (loaded.combinations) {
+        activeCatalogue = loaded;
+        // Merge any missing combinations from default
+        DEFAULT_CATALOGUE.combinations.forEach(function(dc) {
+          var exists = activeCatalogue.combinations.find(function(c) {
+            return c.size === dc.size && c.shape === dc.shape;
+          });
+          if (!exists) activeCatalogue.combinations.push(Object.assign({}, dc));
+        });
+      } else {
+        // Old format — use default
+        activeCatalogue = JSON.parse(JSON.stringify(DEFAULT_CATALOGUE));
+      }
     } else {
-      catalogue = buildDefaultCatalogue();
+      activeCatalogue = JSON.parse(JSON.stringify(DEFAULT_CATALOGUE));
     }
-  } catch(e) { catalogue = buildDefaultCatalogue(); }
-  // Merge any shapes in default that are missing from loaded catalogue
-  var defaults = buildDefaultCatalogue();
-  defaults.shapes.forEach(function(ds) {
-    var exists = catalogue.shapes.find(function(s){ return s.id === ds.id; });
-    if (!exists) catalogue.shapes.push(ds);
-  });
-  window.SHAPES_ACTIVE = catalogue.shapes;
+  } catch(e) {
+    console.warn('Catalogue load failed:', e);
+    activeCatalogue = JSON.parse(JSON.stringify(DEFAULT_CATALOGUE));
+  }
+  var catPage = document.getElementById('page-catalogue');
+  if (catPage && catPage.classList.contains('active')) renderCatalogueEditor();
 }
 
 async function saveCatalogue() {
   var btn = document.getElementById('saveCatalogueBtn');
   btn.textContent = 'Saving...'; btn.disabled = true;
   try {
-    var blob = new Blob([JSON.stringify(catalogue, null, 2)], { type: 'application/json' });
+    var blob = new Blob([JSON.stringify(activeCatalogue, null, 2)], { type: 'application/json' });
     var q = encodeURIComponent("name='" + CATALOGUE_FILE + "' and '" + FOLDER_ID + "' in parents and trashed=false");
     var res = await fetch('https://www.googleapis.com/drive/v3/files?q=' + q + '&fields=files(id)',
       { headers: { Authorization: 'Bearer ' + accessToken } });
@@ -1161,32 +1220,38 @@ async function saveCatalogue() {
       await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
         { method: 'POST', headers: { Authorization: 'Bearer ' + accessToken }, body: form });
     }
-    window.SHAPES_ACTIVE = catalogue.shapes;
-    showToast('Catalogue saved ✓', 'success');
+    showToast('Catalogue saved \u2713', 'success');
   } catch(e) { showToast('Error saving catalogue', 'error'); }
   btn.textContent = 'Save Changes'; btn.disabled = false;
 }
 
 function renderCatalogueEditor() {
-  if (!catalogue) return;
+  if (!activeCatalogue) {
+    document.getElementById('catalogueEditor').innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3);font-size:14px;">Loading catalogue...</div>';
+    loadCatalogue().then(function(){ renderCatalogueEditor(); });
+    return;
+  }
   var ALL_SIZES = ['Single 2.5ft','Single 3ft','Double 4ft','Queen 5ft','King 6ft'];
   var out = '';
   ALL_SIZES.forEach(function(size) {
-    out += '<div class="cat-size-block"><div class="cat-size-header">' + size + '</div>';
-    catalogue.shapes.forEach(function(shape) {
-      var enabled = shape.sizes.includes(size);
-      var mattress = shape.mattress || 'both';
-      var sid = shape.id;
-      var ssz = size;
+    var combos = activeCatalogue.combinations.filter(function(c){ return c.size === size; });
+    out += '<div class="cat-size-block">';
+    out += '<div class="cat-size-header">' + size + ' <span style="font-size:12px;font-weight:500;color:var(--text3);">' + combos.filter(function(c){return c.active!==false;}).length + ' active</span></div>';
+    combos.forEach(function(combo) {
+      var active = combo.active !== false;
+      var mattress = combo.mattress || 'both';
+      var cid = combo.size + '|' + combo.shape;
       out += '<div class="cat-shape-row">';
-      out += '<img class="cat-shape-thumb" src="' + (SHAPE_IMAGES[shape.id] || '') + '" alt="' + shape.label + '">';
-      out += '<div class="cat-shape-name">' + shape.label + '</div>';
-      out += '<div class="cat-enabled"><span class="cat-enabled-label">' + (enabled ? 'ON' : 'OFF') + '</span>';
-      out += '<label class="switch"><input type="checkbox" ' + (enabled ? 'checked' : '') + ' data-shape="' + sid + '" data-size="' + ssz + '" onchange="toggleShapeSize(this)"><span class="slider"></span></label></div>';
-      if (enabled) {
+      out += '<img class="cat-shape-thumb" src="' + (SHAPE_IMAGES[combo.shape]||'') + '" alt="' + combo.shapeLabel + '">';
+      out += '<div class="cat-shape-name">' + combo.shapeLabel + '</div>';
+      // Active toggle
+      out += '<div class="cat-enabled"><span class="cat-enabled-label">' + (active?'ON':'OFF') + '</span>';
+      out += '<label class="switch"><input type="checkbox" ' + (active?'checked':'') + ' data-cid="' + cid + '" onchange="toggleComboActive(this)"><span class="slider"></span></label></div>';
+      // Mattress toggles (only when active)
+      if (active) {
         out += '<div class="cat-toggle-group">';
-        out += '<button class="cat-toggle ' + (mattress === 'with' || mattress === 'both' ? 'on' : '') + '" data-shape="' + sid + '" data-type="with" onclick="toggleMattress(this)">W/ Matt</button>';
-        out += '<button class="cat-toggle ' + (mattress === 'without' || mattress === 'both' ? 'on' : '') + '" data-shape="' + sid + '" data-type="without" onclick="toggleMattress(this)">W/O Matt</button>';
+        out += '<button class="cat-toggle ' + (mattress==='with'||mattress==='both'?'on':'') + '" data-cid="' + cid + '" data-type="with" onclick="toggleComboMattress(this)">W/ Matt</button>';
+        out += '<button class="cat-toggle ' + (mattress==='without'||mattress==='both'?'on':'') + '" data-cid="' + cid + '" data-type="without" onclick="toggleComboMattress(this)">W/O Matt</button>';
         out += '</div>';
       }
       out += '</div>';
@@ -1196,27 +1261,25 @@ function renderCatalogueEditor() {
   document.getElementById('catalogueEditor').innerHTML = out;
 }
 
-function toggleShapeSize(el) {
-  var shapeId = el.getAttribute('data-shape');
-  var size    = el.getAttribute('data-size');
-  var enabled = el.checked;
-  var shape = catalogue.shapes.find(function(s){ return s.id === shapeId; });
-  if (!shape) return;
-  if (enabled) { if (!shape.sizes.includes(size)) shape.sizes.push(size); }
-  else { shape.sizes = shape.sizes.filter(function(s){ return s !== size; }); }
+function toggleComboActive(el) {
+  var parts = el.getAttribute('data-cid').split('|');
+  var size = parts[0]; var shape = parts[1];
+  var combo = activeCatalogue.combinations.find(function(c){ return c.size===size && c.shape===shape; });
+  if (combo) combo.active = el.checked;
   renderCatalogueEditor();
 }
 
-function toggleMattress(el) {
-  var shapeId = el.getAttribute('data-shape');
-  var type    = el.getAttribute('data-type');
-  var shape = catalogue.shapes.find(function(s){ return s.id === shapeId; });
-  if (!shape) return;
-  var cur = shape.mattress || 'both';
+function toggleComboMattress(el) {
+  var parts = el.getAttribute('data-cid').split('|');
+  var size = parts[0]; var shape = parts[1];
+  var type = el.getAttribute('data-type');
+  var combo = activeCatalogue.combinations.find(function(c){ return c.size===size && c.shape===shape; });
+  if (!combo) return;
+  var cur = combo.mattress || 'both';
   if (type === 'with') {
-    shape.mattress = (cur === 'both') ? 'without' : (cur === 'without' ? 'both' : 'without');
+    combo.mattress = cur==='both'?'without': cur==='without'?'both':'without';
   } else {
-    shape.mattress = (cur === 'both') ? 'with' : (cur === 'with' ? 'both' : 'with');
+    combo.mattress = cur==='both'?'with': cur==='with'?'both':'with';
   }
   renderCatalogueEditor();
 }
@@ -1225,6 +1288,7 @@ async function checkOwner(userEmail) {
   isOwner = (userEmail === OWNER_EMAIL);
   if (isOwner) document.getElementById('catalogueTab').style.display = 'block';
 }
+
 
 
 // init
