@@ -192,6 +192,13 @@ input[type="number"] { -moz-appearance: textfield; }
   input:checked + .slider { background: var(--accent); }
   input:checked + .slider:before { transform: translateX(18px); }
   @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+  }
 .empty-state { text-align: center; padding: 48px 20px; color: var(--text3); }
 .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
 .divider { height: 1px; background: var(--border); margin: 16px 0; }
@@ -819,8 +826,32 @@ async function saveDB() {
 
 // ── SUBMIT ────────────────────────────────────────
 async function submitShipment() {
-  if (lineItems.length===0) { showToast('Add at least one frame','error'); return; }
-  if (!selectedSupplier) { showToast('Select a supplier','error'); return; }
+  // Fix 10: prevent double submit
+  if (isSubmitting) return;
+  // Fix 1: block if draft in progress
+  if (hasDraftInProgress()) {
+    var panel = document.getElementById('addFramePanel');
+    if (panel) panel.classList.remove('collapsed');
+    showDraftWarning();
+    showToast('Finish or clear your frame selection first', 'error');
+    return;
+  }
+  // Fix 7: auto-collapse open empty panel
+  if (isPanelOpen()) {
+    var panel = document.getElementById('addFramePanel');
+    if (panel) panel.classList.add('collapsed');
+  }
+  // Fix 2: check line items
+  if (lineItems.length===0) {
+    showToast('Add at least one frame to the shipment', 'error');
+    return;
+  }
+  // Fix 4: check supplier
+  if (!selectedSupplier) {
+    highlightMissing('colourRow');
+    showToast('Select a supplier', 'error');
+    return;
+  }
   const supplierName = selectedSupplier === 'Other'
     ? (document.getElementById('supplierOtherInput').value.trim() || 'Other')
     : selectedSupplier;
@@ -844,8 +875,15 @@ async function submitShipment() {
       status:'active', audit:[]
     };
     shipments.unshift(shipment);
-    await saveDB();
-    showToast('Shipment saved ✓','success');
+    var saved = await saveDBWithRetry();
+    if (!saved) {
+      shipments.shift();
+      showSaveFailedBanner();
+      isSubmitting = false; updateSubmitButton();
+      btn.textContent = 'Submit Shipment';
+      return;
+    }
+    showToast('Shipment saved ✓', 'success');
     resetForm();
   } catch(e) {
     console.error(e); showToast('Error saving shipment','error');
@@ -1375,8 +1413,173 @@ async function checkOwner(userEmail) {
 
 
 
+
+// ── ROBUSTNESS & FOOL-PROOFING ────────────────────
+
+// Fix 10: Submit lock flag (prevents double-tap before async disables button)
+var isSubmitting = false;
+
+// Fix 9: Token refresh wrapper
+async function driveRequest(url, options) {
+  var res = await fetch(url, options);
+  if (res.status === 401 || res.status === 403) {
+    // Try to get a new token
+    var refreshed = await refreshToken();
+    if (refreshed) {
+      options.headers['Authorization'] = 'Bearer ' + accessToken;
+      res = await fetch(url, options);
+    }
+  }
+  return res;
+}
+
+function refreshToken() {
+  return new Promise(function(resolve) {
+    try {
+      var client = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID, scope: SCOPES,
+        callback: function(resp) {
+          if (resp.access_token) { accessToken = resp.access_token; resolve(true); }
+          else resolve(false);
+        }
+      });
+      client.requestAccessToken({ prompt: '' });
+    } catch(e) { resolve(false); }
+  });
+}
+
+// Fix 8: Save with retry
+async function saveDBWithRetry() {
+  try {
+    await saveDB();
+    return true;
+  } catch(e) {
+    console.warn('First save attempt failed, retrying...', e);
+    await new Promise(function(r){ setTimeout(r, 2000); });
+    try {
+      await saveDB();
+      return true;
+    } catch(e2) {
+      console.error('Save failed after retry:', e2);
+      return false;
+    }
+  }
+}
+
+// Fix 11: Warn on page close with unsaved data
+window.addEventListener('beforeunload', function(e) {
+  var hasData = (typeof lineItems !== 'undefined' && lineItems.length > 0) ||
+                (typeof trolleys !== 'undefined' && trolleys.length > 0);
+  if (hasData) {
+    e.preventDefault();
+    e.returnValue = 'You have an unsaved entry. Are you sure you want to leave?';
+    return e.returnValue;
+  }
+});
+
+// Fix 1 & 7: Check for incomplete draft before submit
+function hasDraftInProgress() {
+  // Has started picking but not added
+  return draftCategory !== null && (draftShape !== null || draftSize !== null);
+}
+
+function isPanelOpen() {
+  var panel = document.getElementById('addFramePanel');
+  return panel && !panel.classList.contains('collapsed');
+}
+
+// Fix 3: Shake animation for input
+function shakeInput(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.style.animation = 'none';
+  el.offsetHeight; // reflow
+  el.style.animation = 'shake 0.4s ease';
+  el.style.borderColor = 'var(--danger)';
+  setTimeout(function(){ el.style.borderColor = ''; el.style.animation = ''; }, 1500);
+}
+
+// Fix 4/5: Highlight missing required section
+function highlightMissing(sectionId) {
+  var el = document.getElementById(sectionId);
+  if (!el) return;
+  el.style.outline = '2.5px solid var(--danger)';
+  el.style.borderRadius = 'var(--radius-sm)';
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  setTimeout(function(){ el.style.outline = ''; }, 2500);
+}
+
+// Fix 1: Draft warning banner
+function showDraftWarning() {
+  var existing = document.getElementById('draftWarningBanner');
+  if (existing) return;
+  var banner = document.createElement('div');
+  banner.id = 'draftWarningBanner';
+  banner.style.cssText = 'background:rgba(192,57,43,0.1);border:2px solid var(--danger);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;';
+  banner.innerHTML = '<div style="font-size:13px;font-weight:600;color:var(--danger);">⚠️ Unfinished frame — tap Add or clear before submitting</div>'
+    + '<div style="display:flex;gap:8px;">'
+    + '<button onclick="forceAddLineItem()" style="padding:7px 14px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Add It</button>'
+    + '<button onclick="clearDraft()" style="padding:7px 14px;background:var(--surface3);color:var(--text2);border:1.5px solid var(--border);border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Clear</button>'
+    + '</div>';
+  var submitBtn = document.getElementById('submitBtn');
+  if (submitBtn) submitBtn.parentNode.insertBefore(banner, submitBtn);
+}
+
+function hideDraftWarning() {
+  var b = document.getElementById('draftWarningBanner');
+  if (b) b.remove();
+}
+
+function clearDraft() {
+  draftCategory = null; draftSize = null; draftShape = null; draftMattress = null; draftShapeId = null;
+  document.querySelectorAll('#categoryRow .pill, #sizeRow .pill').forEach(function(p){p.classList.remove('selected');});
+  if (document.getElementById('sizeStep')) document.getElementById('sizeStep').style.display = 'none';
+  if (document.getElementById('shapeStep')) document.getElementById('shapeStep').style.display = 'none';
+  if (document.getElementById('mattressStep')) document.getElementById('mattressStep').style.display = 'none';
+  if (document.getElementById('piecesStep')) document.getElementById('piecesStep').style.display = 'none';
+  if (document.getElementById('piecesInput')) document.getElementById('piecesInput').value = '';
+  var panel = document.getElementById('addFramePanel');
+  if (panel) panel.classList.add('collapsed');
+  hideDraftWarning();
+  updateSubmitButton();
+}
+
+function forceAddLineItem() {
+  var piecesEl = document.getElementById('piecesInput');
+  var pieces = piecesEl ? parseInt(piecesEl.value) : 0;
+  if (!pieces || pieces < 1) {
+    shakeInput('piecesInput');
+    showToast('Enter piece count first', 'error');
+    return;
+  }
+  addLineItem();
+}
+
+// Fix 2: Update submit button state
+function updateSubmitButton() {
+  var btn = document.getElementById('submitBtn');
+  if (!btn) return;
+  var hasItems = (typeof lineItems !== 'undefined' && lineItems.length > 0) ||
+                 (typeof trolleys !== 'undefined' && trolleys.filter(function(t){ return t.lineItems && t.lineItems.length > 0; }).length > 0);
+  btn.disabled = !hasItems || isSubmitting;
+  btn.style.opacity = (!hasItems || isSubmitting) ? '0.4' : '1';
+}
+
+// Fix 8: Save failure banner
+function showSaveFailedBanner() {
+  var existing = document.getElementById('saveFailedBanner');
+  if (existing) return;
+  var banner = document.createElement('div');
+  banner.id = 'saveFailedBanner';
+  banner.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#fff;border:2px solid var(--danger);border-radius:var(--radius-sm);padding:12px 20px;font-size:13px;font-weight:700;color:var(--danger);z-index:500;box-shadow:0 4px 16px rgba(0,0,0,0.15);text-align:center;max-width:340px;width:90%;';
+  banner.innerHTML = '⚠️ Save failed — check your connection<br><span style="font-size:11px;font-weight:500;color:var(--text2);">Your entry is still here. Try submitting again.</span>'
+    + '<button onclick="this.parentNode.remove()" style="display:block;margin:8px auto 0;padding:6px 16px;background:var(--danger);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">OK</button>';
+  document.body.appendChild(banner);
+}
+
 // init
 renderLineItems();
+updateSubmitButton();
 
 </script>
 <script src="https://accounts.google.com/gsi/client" async></script>
