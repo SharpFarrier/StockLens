@@ -496,7 +496,7 @@ function signIn() {
         await loadShipments();
         var ownerEmail2 = await fetchUserProfile();
         await checkOwner(ownerEmail2);
-        await loadCatalogue();
+        loadCatalogue().catch(function(e){ console.warn("Catalogue:", e); });
       }
     }
   });
