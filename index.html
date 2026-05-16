@@ -855,8 +855,9 @@ async function submitShipment() {
   const supplierName = selectedSupplier === 'Other'
     ? (document.getElementById('supplierOtherInput').value.trim() || 'Other')
     : selectedSupplier;
+  isSubmitting = true; updateSubmitButton();
   const btn = document.getElementById('submitBtn');
-  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>';
+  btn.innerHTML='<span class="spinner"></span>';
   try {
     const sid = 'S'+Date.now();
     const now = new Date().toISOString();
@@ -888,7 +889,7 @@ async function submitShipment() {
   } catch(e) {
     console.error(e); showToast('Error saving shipment','error');
   }
-  btn.disabled=false; btn.textContent='Submit Shipment';
+  isSubmitting = false; updateSubmitButton(); btn.textContent='Submit Shipment';
 }
 
 function resetForm() {
@@ -1479,8 +1480,18 @@ window.addEventListener('beforeunload', function(e) {
 
 // Fix 1 & 7: Check for incomplete draft before submit
 function hasDraftInProgress() {
-  // Has started picking but not added
-  return draftCategory !== null && (draftShape !== null || draftSize !== null);
+  // Only flag if category picked but journey is incomplete
+  // For beds: needs size + shape + mattress (or auto-selected) before pieces step
+  // For tables/chairs: needs shape before pieces step
+  // Consider draft in progress only if picker is open AND pieces step not yet visible
+  if (draftCategory === null) return false;
+  var piecesStep = document.getElementById('piecesStep');
+  var panelOpen = isPanelOpen();
+  // If panel is open and pieces step is not visible yet, draft is in progress
+  if (panelOpen && piecesStep && piecesStep.style.display !== 'block') {
+    return draftShape !== null || draftSize !== null;
+  }
+  return false;
 }
 
 function isPanelOpen() {
