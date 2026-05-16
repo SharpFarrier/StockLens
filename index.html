@@ -693,7 +693,9 @@ function selectMattress(el, val) {
 
 // ── ADD LINE ITEM ─────────────────────────────────
 function addLineItem() {
-  if (!draftSize||!draftShape||!draftMattress) { showToast('Complete frame selection','error'); return; }
+  var catDef = typeof getCategoryDef === 'function' ? getCategoryDef(draftCategory||'bed') : { hasSizes: true };
+  var sizeOk = catDef.hasSizes ? !!draftSize : true;
+  if (!sizeOk||!draftShape||!draftMattress) { showToast('Complete frame selection','error'); return; }
   const pieces = parseInt(document.getElementById('piecesInput').value);
   if (!pieces||pieces<1) { showToast('Enter valid piece count','error'); return; }
   lineItems.push({ size:draftSize, shape:draftShape, mattress:draftMattress, pieces });
