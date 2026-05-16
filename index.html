@@ -1572,6 +1572,7 @@ function updateSubmitButton() {
   if (!btn) return;
   var hasItems = (typeof lineItems !== 'undefined' && lineItems.length > 0) ||
                  (typeof trolleys !== 'undefined' && trolleys.filter(function(t){ return t.lineItems && t.lineItems.length > 0; }).length > 0);
+  console.log('[updateSubmitButton] hasItems:', hasItems, 'lineItems:', typeof lineItems !== 'undefined' ? lineItems.length : 'undefined', 'isSubmitting:', isSubmitting);
   btn.disabled = !hasItems || isSubmitting;
   btn.style.opacity = (!hasItems || isSubmitting) ? '0.4' : '1';
 }
