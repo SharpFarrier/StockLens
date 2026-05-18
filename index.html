@@ -192,6 +192,51 @@ input[type="number"] { -moz-appearance: textfield; }
   input:checked + .slider { background: var(--accent); }
   input:checked + .slider:before { transform: translateX(18px); }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* SEARCH */
+  .search-section { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
+  .search-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .search-row-full { margin-bottom: 12px; }
+  .search-label { font-size: 11px; font-weight: 800; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+  .date-input-wrap { position: relative; }
+  .date-input-wrap input[type="date"] {
+    width: 100%; background: var(--surface2); border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm); color: var(--text); font-size: 14px;
+    padding: 11px 14px; outline: none; font-family: inherit;
+    -webkit-appearance: none; appearance: none; cursor: pointer;
+  }
+  .date-input-wrap input[type="date"]:focus { border-color: var(--accent); }
+  .date-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0; position: absolute; right: 0; top: 0; width: 100%; height: 100%; cursor: pointer;
+  }
+  .date-input-wrap .cal-icon {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    font-size: 15px; pointer-events: none; color: var(--text3);
+  }
+  .shape-select {
+    width: 100%; background: var(--surface2); border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm); color: var(--text); font-size: 14px;
+    padding: 11px 14px; outline: none; font-family: inherit;
+    -webkit-appearance: none; appearance: none; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23777' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center;
+    padding-right: 36px;
+  }
+  .shape-select:focus { border-color: var(--accent); }
+  .search-actions { display: flex; gap: 8px; }
+  .btn-search { flex: 1; padding: 12px; background: var(--accent); color: #fff; font-size: 14px; font-weight: 700; border: none; border-radius: var(--radius-sm); cursor: pointer; font-family: inherit; }
+  .btn-clear-search { padding: 12px 16px; background: var(--surface2); color: var(--text2); font-size: 13px; font-weight: 700; border: 1.5px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; font-family: inherit; }
+  .search-summary { background: rgba(212,121,10,0.08); border: 1.5px solid rgba(212,121,10,0.25); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 14px; display: none; }
+  .search-summary.show { display: block; }
+  .search-summary-text { font-size: 14px; font-weight: 700; color: var(--accent); }
+  .search-summary-sub { font-size: 12px; color: var(--text2); margin-top: 3px; }
+  .search-result-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 8px; }
+  .search-result-dt { font-size: 12px; color: var(--text3); margin-bottom: 6px; }
+  .search-result-row { display: flex; align-items: center; justify-content: space-between; }
+  .search-result-info { font-size: 14px; font-weight: 700; color: var(--text); }
+  .search-result-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .search-result-pieces { font-size: 22px; font-weight: 800; color: var(--accent); }
+
   @keyframes shake {
     0%,100% { transform: translateX(0); }
     20% { transform: translateX(-6px); }
@@ -375,6 +420,60 @@ input[type="number"] { -moz-appearance: textfield; }
 
   <!-- MANAGER PAGE -->
   <div id="page-manager" class="page">
+
+    <!-- SEARCH -->
+    <div class="search-section">
+      <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:14px;">🔍 Search Entries</div>
+      <div class="search-row">
+        <div>
+          <div class="search-label">From Date</div>
+          <div class="date-input-wrap">
+            <input type="date" id="searchFromDate">
+            <span class="cal-icon">📅</span>
+          </div>
+        </div>
+        <div>
+          <div class="search-label">To Date</div>
+          <div class="date-input-wrap">
+            <input type="date" id="searchToDate">
+            <span class="cal-icon">📅</span>
+          </div>
+        </div>
+      </div>
+      <div class="search-row-full">
+        <div class="search-label">Shape</div>
+        <select class="shape-select" id="searchShape">
+          <option value="">All Shapes</option>
+          <option value="Round">Round</option>
+          <option value="Square">Square</option>
+          <option value="Metal">Metal</option>
+          <option value="Headboard">Headboard</option>
+          <option value="Element">Element</option>
+          <option value="Trolley">Trolley</option>
+          <option value="Golden">Golden</option>
+          <option value="LG">LG</option>
+          <option value="Nesto">Nesto</option>
+          <option value="Oslo">Oslo</option>
+          <option value="Wooden Half Patti">Wooden Half Patti</option>
+          <option value="Wooden Full Patti">Wooden Full Patti</option>
+          <option value="Base">Base</option>
+          <option value="Duke">Duke</option>
+          <option value="Lizon">Lizon</option>
+          <option value="Eva">Eva</option>
+        </select>
+      </div>
+      <div class="search-actions">
+        <button class="btn-search" onclick="runSearch()">Search</button>
+        <button class="btn-clear-search" onclick="clearSearch()">Clear</button>
+      </div>
+    </div>
+
+    <div class="search-summary" id="searchSummary">
+      <div class="search-summary-text" id="searchSummaryText"></div>
+      <div class="search-summary-sub" id="searchSummarySub"></div>
+    </div>
+    <div id="searchResults" style="display:none"></div>
+
     <div class="stats-row">
       <div class="stat-card"><div class="stat-val" id="statShipments">0</div><div class="stat-label">Shipments</div></div>
       <div class="stat-card"><div class="stat-val" id="statToday">0</div><div class="stat-label">Today</div></div>
@@ -1590,6 +1689,65 @@ function showSaveFailedBanner() {
   banner.innerHTML = '⚠️ Save failed — check your connection<br><span style="font-size:11px;font-weight:500;color:var(--text2);">Your entry is still here. Try submitting again.</span>'
     + '<button onclick="this.parentNode.remove()" style="display:block;margin:8px auto 0;padding:6px 16px;background:var(--danger);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">OK</button>';
   document.body.appendChild(banner);
+}
+
+// ── SEARCH ────────────────────────────────────────
+function runSearch() {
+  var fromDate = document.getElementById('searchFromDate').value;
+  var toDate   = document.getElementById('searchToDate').value;
+  var shape    = document.getElementById('searchShape').value;
+  if (!fromDate && !toDate && !shape) { showToast('Set at least one filter', 'error'); return; }
+  var results = [];
+  var data = typeof shipments !== 'undefined' ? shipments : [];
+  data.forEach(function(s) {
+    if (s.status === 'deleted') return;
+    var dk = s.timestamp ? s.timestamp.slice(0,10) : '';
+    if (fromDate && dk < fromDate) return;
+    if (toDate   && dk > toDate)   return;
+    (s.lineItems||[]).forEach(function(l) {
+      if (shape && l.shape !== shape) return;
+      results.push({ timestamp: s.timestamp, id: s.id, supplier: s.supplier||'', vehicle: s.vehicle||'', size: l.size||'', shape: l.shape, mattress: l.mattress, pieces: l.pieces });
+    });
+  });
+  renderSearchResults(results, fromDate, toDate, shape, null);
+}
+
+function renderSearchResults(results, fromDate, toDate, shape, colour) {
+  var summary = document.getElementById('searchSummary');
+  var resultsDiv = document.getElementById('searchResults');
+  if (results.length === 0) {
+    summary.classList.add('show');
+    document.getElementById('searchSummaryText').textContent = 'No entries found';
+    document.getElementById('searchSummarySub').textContent = 'Try adjusting your filters';
+    resultsDiv.style.display = 'none';
+    return;
+  }
+  var totalPieces = results.reduce(function(s,r){ return s+r.pieces; }, 0);
+  var filterDesc = [];
+  if (fromDate||toDate) filterDesc.push((fromDate||'...')+' to '+(toDate||'today'));
+  if (shape) filterDesc.push(shape);
+  if (colour) filterDesc.push(colour);
+  summary.classList.add('show');
+  document.getElementById('searchSummaryText').textContent = results.length+' result'+(results.length>1?'s':'')+' \u2022 '+totalPieces+' pieces';
+  document.getElementById('searchSummarySub').textContent = 'Filters: '+(filterDesc.join(' | ')||'None');
+  resultsDiv.style.display = 'block';
+  resultsDiv.innerHTML = results.map(function(r) {
+    var dt = r.timestamp ? new Date(r.timestamp).toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '--';
+    return '<div class="search-result-card">'
+      +'<div class="search-result-dt">'+dt+(r.supplier?' \u2022 '+r.supplier:'')+(r.vehicle?' \u2022 '+r.vehicle:'')+'</div>'
+      +'<div class="search-result-row"><div>'
+      +'<div class="search-result-info">'+r.shape+' \u2022 '+r.mattress+'</div>'
+      +'<div class="search-result-sub">'+r.size+'</div>'
+      +'</div><div class="search-result-pieces">'+r.pieces+'</div></div></div>';
+  }).join('');
+}
+
+function clearSearch() {
+  document.getElementById('searchFromDate').value = '';
+  document.getElementById('searchToDate').value = '';
+  document.getElementById('searchShape').value = '';
+  document.getElementById('searchSummary').classList.remove('show');
+  document.getElementById('searchResults').style.display = 'none';
 }
 
 // init
